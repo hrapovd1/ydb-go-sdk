@@ -525,7 +525,7 @@ func TestSessionPoolSizeLimitOverflow(t *testing.T) {
 			p := newClientWithStubBuilder(
 				t,
 				testutil.NewBalancer(testutil.WithInvokeHandlers(testutil.InvokeHandlers{
-					testutil.TableCreateSession: func(interface{}) (result proto.Message, _ error) {
+					testutil.TableCreateSession: func(interface{}) (proto.Message, error) {
 						return &Ydb_Table.CreateSessionResult{
 							SessionId: testutil.SessionID(),
 						}, nil
@@ -871,7 +871,11 @@ func newClientWithStubBuilder(
 	return c
 }
 
-func (s *StubBuilder) createSession(ctx context.Context) (session *session, err error) {
+func (s *StubBuilder) createSession(ctx context.Context) (*session, error) {
+	var (
+		session *session
+		err     error
+	)
 	defer s.mu.WithLock(func() {
 		if session != nil {
 			s.actual++

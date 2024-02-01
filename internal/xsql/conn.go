@@ -148,13 +148,16 @@ func (c *conn) isReady() bool {
 	return c.session.Status() == table.SessionReady
 }
 
-func (c *conn) PrepareContext(ctx context.Context, query string) (_ driver.Stmt, finalErr error) {
+func (c *conn) PrepareContext(ctx context.Context, query string) (driver.Stmt, error) {
 	if c.currentTx != nil {
 		return c.currentTx.PrepareContext(ctx, query)
 	}
-	onDone := trace.DatabaseSQLOnConnPrepare(c.trace, &ctx,
-		stack.FunctionID(""),
-		query,
+	var (
+		finalErr error
+		onDone   = trace.DatabaseSQLOnConnPrepare(c.trace, &ctx,
+			stack.FunctionID(""),
+			query,
+		)
 	)
 	defer func() {
 		onDone(finalErr)
@@ -178,7 +181,7 @@ func (c *conn) sinceLastUsage() time.Duration {
 }
 
 func (c *conn) execContext(ctx context.Context, query string, args []driver.NamedValue) (
-	_ driver.Result, finalErr error,
+	driver.Result, error,
 ) {
 	defer func() {
 		c.lastUsage.Store(time.Now().Unix())
@@ -199,6 +202,7 @@ func (c *conn) execContext(ctx context.Context, query string, args []driver.Name
 			stack.FunctionID(""),
 			query, m.String(), xcontext.IsIdempotent(ctx), c.sinceLastUsage(),
 		)
+		finalErr error
 	)
 	defer func() {
 		onDone(finalErr)
@@ -265,7 +269,7 @@ func (c *conn) execContext(ctx context.Context, query string, args []driver.Name
 	}
 }
 
-func (c *conn) ExecContext(ctx context.Context, query string, args []driver.NamedValue) (_ driver.Result, _ error) {
+func (c *conn) ExecContext(ctx context.Context, query string, args []driver.NamedValue) (driver.Result, error) {
 	if !c.isReady() {
 		return nil, badconn.Map(xerrors.WithStackTrace(errNotReadyConn))
 	}
@@ -275,7 +279,7 @@ func (c *conn) ExecContext(ctx context.Context, query string, args []driver.Name
 	return c.execContext(ctx, query, args)
 }
 
-func (c *conn) QueryContext(ctx context.Context, query string, args []driver.NamedValue) (_ driver.Rows, _ error) {
+func (c *conn) QueryContext(ctx context.Context, query string, args []driver.NamedValue) (driver.Rows, error) {
 	if !c.isReady() {
 		return nil, badconn.Map(xerrors.WithStackTrace(errNotReadyConn))
 	}
@@ -286,7 +290,7 @@ func (c *conn) QueryContext(ctx context.Context, query string, args []driver.Nam
 }
 
 func (c *conn) queryContext(ctx context.Context, query string, args []driver.NamedValue) (
-	_ driver.Rows, finalErr error,
+	driver.Rows, error,
 ) {
 	defer func() {
 		c.lastUsage.Store(time.Now().Unix())
@@ -307,6 +311,7 @@ func (c *conn) queryContext(ctx context.Context, query string, args []driver.Nam
 			stack.FunctionID(""),
 			query, m.String(), xcontext.IsIdempotent(ctx), c.sinceLastUsage(),
 		)
+		finalErr error
 	)
 	defer func() {
 		onDone(finalErr)
@@ -386,8 +391,11 @@ func (c *conn) queryContext(ctx context.Context, query string, args []driver.Nam
 	}
 }
 
-func (c *conn) Ping(ctx context.Context) (finalErr error) {
-	onDone := trace.DatabaseSQLOnConnPing(c.trace, &ctx, stack.FunctionID(""))
+func (c *conn) Ping(ctx context.Context) error {
+	var (
+		finalErr error
+		onDone   = trace.DatabaseSQLOnConnPing(c.trace, &ctx, stack.FunctionID(""))
+	)
 	defer func() {
 		onDone(finalErr)
 	}()
@@ -400,7 +408,8 @@ func (c *conn) Ping(ctx context.Context) (finalErr error) {
 	return nil
 }
 
-func (c *conn) Close() (finalErr error) {
+func (c *conn) Close() error {
+	var finalErr error
 	if c.closed.CompareAndSwap(false, true) {
 		c.connector.detach(c)
 		onDone := trace.DatabaseSQLOnConnClose(
@@ -430,8 +439,9 @@ func (c *conn) Begin() (driver.Tx, error) {
 	return nil, errDeprecated
 }
 
-func (c *conn) normalize(q string, args ...driver.NamedValue) (query string, _ *table.QueryParameters, _ error) {
-	return c.connector.Bindings.RewriteQuery(q, func() (ii []interface{}) {
+func (c *conn) normalize(q string, args ...driver.NamedValue) (string, *table.QueryParameters, error) {
+	return c.connector.Bindings.RewriteQuery(q, func() []interface{} {
+		var ii []interface{}
 		for i := range args {
 			ii = append(ii, args[i])
 		}
@@ -443,9 +453,12 @@ func (c *conn) ID() string {
 	return c.session.ID()
 }
 
-func (c *conn) BeginTx(ctx context.Context, txOptions driver.TxOptions) (_ driver.Tx, finalErr error) {
-	var tx currentTx
-	onDone := trace.DatabaseSQLOnConnBegin(c.trace, &ctx, stack.FunctionID(""))
+func (c *conn) BeginTx(ctx context.Context, txOptions driver.TxOptions) (driver.Tx, error) {
+	var (
+		tx       currentTx
+		finalErr error
+		onDone   = trace.DatabaseSQLOnConnBegin(c.trace, &ctx, stack.FunctionID(""))
+	)
 	defer func() {
 		onDone(tx, finalErr)
 	}()
@@ -490,11 +503,15 @@ func (c *conn) Version(_ context.Context) (_ string, _ error) {
 	return version, nil
 }
 
-func (c *conn) IsTableExists(ctx context.Context, tableName string) (tableExists bool, finalErr error) {
+func (c *conn) IsTableExists(ctx context.Context, tableName string) (bool, error) {
 	tableName = c.normalizePath(tableName)
-	onDone := trace.DatabaseSQLOnConnIsTableExists(c.trace, &ctx,
-		stack.FunctionID(""),
-		tableName,
+	var (
+		tableExists bool
+		finalErr    error
+		onDone      = trace.DatabaseSQLOnConnIsTableExists(c.trace, &ctx,
+			stack.FunctionID(""),
+			tableName,
+		)
 	)
 	defer func() {
 		onDone(tableExists, finalErr)
@@ -509,8 +526,9 @@ func (c *conn) IsTableExists(ctx context.Context, tableName string) (tableExists
 	return tableExists, nil
 }
 
-func (c *conn) IsColumnExists(ctx context.Context, tableName, columnName string) (columnExists bool, _ error) {
+func (c *conn) IsColumnExists(ctx context.Context, tableName, columnName string) (bool, error) {
 	tableName = c.normalizePath(tableName)
+	var columnExists bool
 	tableExists, err := helpers.IsEntryExists(ctx,
 		c.connector.parent.Scheme(), tableName,
 		scheme.EntryTable, scheme.EntryColumnTable,
@@ -522,10 +540,10 @@ func (c *conn) IsColumnExists(ctx context.Context, tableName, columnName string)
 		return false, xerrors.WithStackTrace(fmt.Errorf("table '%s' not exist", tableName))
 	}
 
-	err = retry.Retry(ctx, func(ctx context.Context) (err error) {
-		desc, err := c.session.DescribeTable(ctx, tableName)
-		if err != nil {
-			return err
+	err = retry.Retry(ctx, func(ctx context.Context) error {
+		desc, errIn := c.session.DescribeTable(ctx, tableName)
+		if errIn != nil {
+			return errIn
 		}
 		for i := range desc.Columns {
 			if desc.Columns[i].Name == columnName {
@@ -541,7 +559,8 @@ func (c *conn) IsColumnExists(ctx context.Context, tableName, columnName string)
 	return columnExists, nil
 }
 
-func (c *conn) GetColumns(ctx context.Context, tableName string) (columns []string, _ error) {
+func (c *conn) GetColumns(ctx context.Context, tableName string) ([]string, error) {
+	var columns []string
 	tableName = c.normalizePath(tableName)
 	tableExists, err := helpers.IsEntryExists(ctx,
 		c.connector.parent.Scheme(), tableName,
@@ -554,10 +573,10 @@ func (c *conn) GetColumns(ctx context.Context, tableName string) (columns []stri
 		return nil, xerrors.WithStackTrace(fmt.Errorf("table '%s' not exist", tableName))
 	}
 
-	err = retry.Retry(ctx, func(ctx context.Context) (err error) {
-		desc, err := c.session.DescribeTable(ctx, tableName)
-		if err != nil {
-			return err
+	err = retry.Retry(ctx, func(ctx context.Context) error {
+		desc, errIn := c.session.DescribeTable(ctx, tableName)
+		if errIn != nil {
+			return errIn
 		}
 		for i := range desc.Columns {
 			columns = append(columns, desc.Columns[i].Name)
@@ -570,7 +589,7 @@ func (c *conn) GetColumns(ctx context.Context, tableName string) (columns []stri
 	return columns, nil
 }
 
-func (c *conn) GetColumnType(ctx context.Context, tableName, columnName string) (dataType string, _ error) {
+func (c *conn) GetColumnType(ctx context.Context, tableName, columnName string) (string, error) {
 	tableName = c.normalizePath(tableName)
 	tableExists, err := helpers.IsEntryExists(ctx,
 		c.connector.parent.Scheme(), tableName,
@@ -591,10 +610,11 @@ func (c *conn) GetColumnType(ctx context.Context, tableName, columnName string) 
 		return "", xerrors.WithStackTrace(fmt.Errorf("column '%s' not exist in table '%s'", columnName, tableName))
 	}
 
-	err = retry.Retry(ctx, func(ctx context.Context) (err error) {
-		desc, err := c.session.DescribeTable(ctx, tableName)
-		if err != nil {
-			return err
+	var dataType string
+	err = retry.Retry(ctx, func(ctx context.Context) error {
+		desc, errIn := c.session.DescribeTable(ctx, tableName)
+		if errIn != nil {
+			return errIn
 		}
 		for i := range desc.Columns {
 			if desc.Columns[i].Name == columnName {
@@ -610,7 +630,7 @@ func (c *conn) GetColumnType(ctx context.Context, tableName, columnName string) 
 	return dataType, nil
 }
 
-func (c *conn) GetPrimaryKeys(ctx context.Context, tableName string) (pkCols []string, _ error) {
+func (c *conn) GetPrimaryKeys(ctx context.Context, tableName string) ([]string, error) {
 	tableName = c.normalizePath(tableName)
 	tableExists, err := helpers.IsEntryExists(ctx,
 		c.connector.parent.Scheme(), tableName,
@@ -623,10 +643,11 @@ func (c *conn) GetPrimaryKeys(ctx context.Context, tableName string) (pkCols []s
 		return nil, xerrors.WithStackTrace(fmt.Errorf("table '%s' not exist", tableName))
 	}
 
-	err = retry.Retry(ctx, func(ctx context.Context) (err error) {
-		desc, err := c.session.DescribeTable(ctx, tableName)
-		if err != nil {
-			return err
+	var pkCols []string
+	err = retry.Retry(ctx, func(ctx context.Context) error {
+		desc, errIn := c.session.DescribeTable(ctx, tableName)
+		if errIn != nil {
+			return errIn
 		}
 		pkCols = append(pkCols, desc.PrimaryKey...)
 		return nil
@@ -637,7 +658,7 @@ func (c *conn) GetPrimaryKeys(ctx context.Context, tableName string) (pkCols []s
 	return pkCols, nil
 }
 
-func (c *conn) IsPrimaryKey(ctx context.Context, tableName, columnName string) (ok bool, _ error) {
+func (c *conn) IsPrimaryKey(ctx context.Context, tableName, columnName string) (bool, error) {
 	tableName = c.normalizePath(tableName)
 	tableExists, err := helpers.IsEntryExists(ctx,
 		c.connector.parent.Scheme(), tableName,
@@ -658,6 +679,7 @@ func (c *conn) IsPrimaryKey(ctx context.Context, tableName, columnName string) (
 		return false, xerrors.WithStackTrace(fmt.Errorf("column '%s' not exist in table '%s'", columnName, tableName))
 	}
 
+	var ok bool
 	pkCols, err := c.GetPrimaryKeys(ctx, tableName)
 	if err != nil {
 		return false, xerrors.WithStackTrace(err)
@@ -671,7 +693,7 @@ func (c *conn) IsPrimaryKey(ctx context.Context, tableName, columnName string) (
 	return ok, nil
 }
 
-func (c *conn) normalizePath(folderOrTable string) (absPath string) {
+func (c *conn) normalizePath(folderOrTable string) string {
 	return c.connector.pathNormalizer.NormalizePath(folderOrTable)
 }
 
@@ -688,14 +710,17 @@ func isSysDir(databaseName, dirAbsPath string) bool {
 }
 
 func (c *conn) getTables(ctx context.Context, absPath string, recursive, excludeSysDirs bool) (
-	tables []string, _ error,
+	[]string, error,
 ) {
 	if excludeSysDirs && isSysDir(c.connector.parent.Name(), absPath) {
 		return nil, nil
 	}
 
-	var d scheme.Directory
-	err := retry.Retry(ctx, func(ctx context.Context) (err error) {
+	var (
+		d   scheme.Directory
+		err error
+	)
+	err = retry.Retry(ctx, func(ctx context.Context) error {
 		d, err = c.connector.parent.Scheme().ListDirectory(ctx, absPath)
 		return err
 	}, retry.WithIdempotent(true))
@@ -707,6 +732,7 @@ func (c *conn) getTables(ctx context.Context, absPath string, recursive, exclude
 		return nil, xerrors.WithStackTrace(fmt.Errorf("'%s' is not a folder", absPath))
 	}
 
+	var tables []string
 	for i := range d.Children {
 		switch d.Children[i].Type {
 		case scheme.EntryTable, scheme.EntryColumnTable:
@@ -726,12 +752,16 @@ func (c *conn) getTables(ctx context.Context, absPath string, recursive, exclude
 }
 
 func (c *conn) GetTables(ctx context.Context, folder string, recursive, excludeSysDirs bool) (
-	tables []string, _ error,
+	[]string, error,
 ) {
 	absPath := c.normalizePath(folder)
 
-	var e scheme.Entry
-	err := retry.Retry(ctx, func(ctx context.Context) (err error) {
+	var (
+		e      scheme.Entry
+		err    error
+		tables []string
+	)
+	err = retry.Retry(ctx, func(ctx context.Context) error {
 		e, err = c.connector.parent.Scheme().DescribePath(ctx, absPath)
 		return err
 	}, retry.WithIdempotent(true))
@@ -759,7 +789,7 @@ func (c *conn) GetTables(ctx context.Context, folder string, recursive, excludeS
 	}
 }
 
-func (c *conn) GetIndexes(ctx context.Context, tableName string) (indexes []string, _ error) {
+func (c *conn) GetIndexes(ctx context.Context, tableName string) ([]string, error) {
 	tableName = c.normalizePath(tableName)
 	tableExists, err := helpers.IsEntryExists(ctx,
 		c.connector.parent.Scheme(), tableName,
@@ -772,10 +802,11 @@ func (c *conn) GetIndexes(ctx context.Context, tableName string) (indexes []stri
 		return nil, xerrors.WithStackTrace(fmt.Errorf("table '%s' not exist", tableName))
 	}
 
-	err = retry.Retry(ctx, func(ctx context.Context) (err error) {
-		desc, err := c.session.DescribeTable(ctx, tableName)
-		if err != nil {
-			return err
+	var indexes []string
+	err = retry.Retry(ctx, func(ctx context.Context) error {
+		desc, errIn := c.session.DescribeTable(ctx, tableName)
+		if errIn != nil {
+			return errIn
 		}
 		for i := range desc.Indexes {
 			indexes = append(indexes, desc.Indexes[i].Name)
@@ -789,7 +820,7 @@ func (c *conn) GetIndexes(ctx context.Context, tableName string) (indexes []stri
 	return indexes, nil
 }
 
-func (c *conn) GetIndexColumns(ctx context.Context, tableName, indexName string) (columns []string, _ error) {
+func (c *conn) GetIndexColumns(ctx context.Context, tableName, indexName string) ([]string, error) {
 	tableName = c.normalizePath(tableName)
 	tableExists, err := helpers.IsEntryExists(ctx,
 		c.connector.parent.Scheme(), tableName,
@@ -802,10 +833,11 @@ func (c *conn) GetIndexColumns(ctx context.Context, tableName, indexName string)
 		return nil, xerrors.WithStackTrace(fmt.Errorf("table '%s' not exist", tableName))
 	}
 
-	err = retry.Retry(ctx, func(ctx context.Context) (err error) {
-		desc, err := c.session.DescribeTable(ctx, tableName)
-		if err != nil {
-			return err
+	var columns []string
+	err = retry.Retry(ctx, func(ctx context.Context) error {
+		desc, errIn := c.session.DescribeTable(ctx, tableName)
+		if errIn != nil {
+			return errIn
 		}
 		for i := range desc.Indexes {
 			if desc.Indexes[i].Name == indexName {

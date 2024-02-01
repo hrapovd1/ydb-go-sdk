@@ -53,8 +53,8 @@ func CheckResetReconnectionCounters(lastTry, now time.Time, connectionTimeout ti
 }
 
 func CheckRetryMode(err error, settings RetrySettings, retriesDuration time.Duration) (
-	_ backoff.Backoff,
-	isRetriable bool,
+	backoff.Backoff,
+	bool,
 ) {
 	// nil is not error and doesn't need retry it.
 	if err == nil {
@@ -70,9 +70,11 @@ func CheckRetryMode(err error, settings RetrySettings, retriesDuration time.Dura
 		return nil, false
 	}
 
-	mode := retry.Check(err)
-
-	decision := PublicRetryDecisionDefault
+	var (
+		isRetriable bool
+		mode        = retry.Check(err)
+		decision    = PublicRetryDecisionDefault
+	)
 	if settings.CheckError != nil {
 		decision = settings.CheckError(NewCheckRetryArgs(err))
 	}

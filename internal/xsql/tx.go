@@ -70,10 +70,13 @@ func (tx *tx) checkTxState() error {
 	)
 }
 
-func (tx *tx) Commit() (finalErr error) {
-	onDone := trace.DatabaseSQLOnTxCommit(tx.conn.trace, &tx.txCtx,
-		stack.FunctionID(""),
-		tx,
+func (tx *tx) Commit() error {
+	var (
+		finalErr error
+		onDone   = trace.DatabaseSQLOnTxCommit(tx.conn.trace, &tx.txCtx,
+			stack.FunctionID(""),
+			tx,
+		)
 	)
 	defer func() {
 		onDone(finalErr)
@@ -91,10 +94,13 @@ func (tx *tx) Commit() (finalErr error) {
 	return nil
 }
 
-func (tx *tx) Rollback() (finalErr error) {
-	onDone := trace.DatabaseSQLOnTxRollback(tx.conn.trace, &tx.txCtx,
-		stack.FunctionID(""),
-		tx,
+func (tx *tx) Rollback() error {
+	var (
+		finalErr error
+		onDone   = trace.DatabaseSQLOnTxRollback(tx.conn.trace, &tx.txCtx,
+			stack.FunctionID(""),
+			tx,
+		)
 	)
 	defer func() {
 		onDone(finalErr)
@@ -113,11 +119,14 @@ func (tx *tx) Rollback() (finalErr error) {
 }
 
 func (tx *tx) QueryContext(ctx context.Context, query string, args []driver.NamedValue) (
-	_ driver.Rows, finalErr error,
+	driver.Rows, error,
 ) {
-	onDone := trace.DatabaseSQLOnTxQuery(tx.conn.trace, &ctx,
-		stack.FunctionID(""),
-		tx.txCtx, tx, query, true,
+	var (
+		finalErr error
+		onDone   = trace.DatabaseSQLOnTxQuery(tx.conn.trace, &ctx,
+			stack.FunctionID(""),
+			tx.txCtx, tx, query, true,
+		)
 	)
 	defer func() {
 		onDone(finalErr)
@@ -154,11 +163,14 @@ func (tx *tx) QueryContext(ctx context.Context, query string, args []driver.Name
 }
 
 func (tx *tx) ExecContext(ctx context.Context, query string, args []driver.NamedValue) (
-	_ driver.Result, finalErr error,
+	driver.Result, error,
 ) {
-	onDone := trace.DatabaseSQLOnTxExec(tx.conn.trace, &ctx,
-		stack.FunctionID(""),
-		tx.txCtx, tx, query, true,
+	var (
+		finalErr error
+		onDone   = trace.DatabaseSQLOnTxExec(tx.conn.trace, &ctx,
+			stack.FunctionID(""),
+			tx.txCtx, tx, query, true,
+		)
 	)
 	defer func() {
 		onDone(finalErr)
@@ -188,10 +200,13 @@ func (tx *tx) ExecContext(ctx context.Context, query string, args []driver.Named
 	return resultNoRows{}, nil
 }
 
-func (tx *tx) PrepareContext(ctx context.Context, query string) (_ driver.Stmt, finalErr error) {
-	onDone := trace.DatabaseSQLOnTxPrepare(tx.conn.trace, &ctx,
-		stack.FunctionID(""),
-		&tx.txCtx, tx, query,
+func (tx *tx) PrepareContext(ctx context.Context, query string) (driver.Stmt, error) {
+	var (
+		finalErr error
+		onDone   = trace.DatabaseSQLOnTxPrepare(tx.conn.trace, &ctx,
+			stack.FunctionID(""),
+			&tx.txCtx, tx, query,
+		)
 	)
 	defer func() {
 		onDone(finalErr)

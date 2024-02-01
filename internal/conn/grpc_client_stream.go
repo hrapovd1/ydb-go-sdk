@@ -27,7 +27,6 @@ type grpcClientStream struct {
 
 func (s *grpcClientStream) CloseSend() error {
 	err := s.ClientStream.CloseSend()
-
 	if err != nil {
 		if s.wrapping {
 			return s.wrapError(
@@ -49,7 +48,6 @@ func (s *grpcClientStream) SendMsg(m interface{}) error {
 	defer cancel()
 
 	err := s.ClientStream.SendMsg(m)
-
 	if err != nil {
 		defer func() {
 			s.c.onTransportError(s.Context(), err)
