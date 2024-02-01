@@ -74,7 +74,7 @@ type Meta struct {
 	capabilities []string
 }
 
-func (m *Meta) meta(ctx context.Context) (_ metadata.MD, err error) {
+func (m *Meta) meta(ctx context.Context) (metadata.MD, error) {
 	md, has := metadata.FromOutgoingContext(ctx)
 	if !has {
 		md = metadata.MD{}
@@ -106,7 +106,10 @@ func (m *Meta) meta(ctx context.Context) (_ metadata.MD, err error) {
 		return md, nil
 	}
 
-	var token string
+	var (
+		token string
+		err   error
+	)
 
 	done := trace.DriverOnGetCredentials(m.trace, &ctx, stack.FunctionID(""))
 	defer func() {
@@ -126,7 +129,7 @@ func (m *Meta) meta(ctx context.Context) (_ metadata.MD, err error) {
 	return md, nil
 }
 
-func (m *Meta) Context(ctx context.Context) (_ context.Context, err error) {
+func (m *Meta) Context(ctx context.Context) (context.Context, error) {
 	md, err := m.meta(ctx)
 	if err != nil {
 		return ctx, xerrors.WithStackTrace(err)

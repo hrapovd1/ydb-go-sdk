@@ -25,8 +25,8 @@ type grpcClientStream struct {
 	recv     func(error) func(error, trace.ConnState, map[string][]string)
 }
 
-func (s *grpcClientStream) CloseSend() (err error) {
-	err = s.ClientStream.CloseSend()
+func (s *grpcClientStream) CloseSend() error {
+	err := s.ClientStream.CloseSend()
 
 	if err != nil {
 		if s.wrapping {
@@ -44,11 +44,11 @@ func (s *grpcClientStream) CloseSend() (err error) {
 	return nil
 }
 
-func (s *grpcClientStream) SendMsg(m interface{}) (err error) {
+func (s *grpcClientStream) SendMsg(m interface{}) error {
 	cancel := createPinger(s.c)
 	defer cancel()
 
-	err = s.ClientStream.SendMsg(m)
+	err := s.ClientStream.SendMsg(m)
 
 	if err != nil {
 		defer func() {
@@ -74,7 +74,8 @@ func (s *grpcClientStream) SendMsg(m interface{}) (err error) {
 	return nil
 }
 
-func (s *grpcClientStream) RecvMsg(m interface{}) (err error) {
+func (s *grpcClientStream) RecvMsg(m interface{}) error {
+	var err error
 	cancel := createPinger(s.c)
 	defer cancel()
 

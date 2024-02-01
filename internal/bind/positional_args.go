@@ -7,7 +7,6 @@ import (
 
 	"github.com/ydb-platform/ydb-go-sdk/v3/internal/xerrors"
 	"github.com/ydb-platform/ydb-go-sdk/v3/internal/xstring"
-	"github.com/ydb-platform/ydb-go-sdk/v3/table"
 )
 
 type PositionalArgs struct{}
@@ -17,7 +16,7 @@ func (m PositionalArgs) blockID() blockID {
 }
 
 func (m PositionalArgs) RewriteQuery(sql string, args ...interface{}) (
-	yql string, newArgs []interface{}, err error,
+	string, []interface{}, error,
 ) {
 	l := &sqlLexer{
 		src:        sql,
@@ -32,7 +31,7 @@ func (m PositionalArgs) RewriteQuery(sql string, args ...interface{}) (
 	var (
 		buffer   = xstring.Buffer()
 		position = 0
-		param    table.ParameterOption
+		newArgs  = make([]interface{}, 0)
 	)
 	defer buffer.Free()
 
@@ -47,7 +46,7 @@ func (m PositionalArgs) RewriteQuery(sql string, args ...interface{}) (
 				)
 			}
 			paramName := "$p" + strconv.Itoa(position)
-			param, err = toYdbParam(paramName, args[position])
+			param, err := toYdbParam(paramName, args[position])
 			if err != nil {
 				return "", nil, xerrors.WithStackTrace(err)
 			}
