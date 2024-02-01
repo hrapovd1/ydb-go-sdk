@@ -42,7 +42,8 @@ func (s *connectionsState) PreferredCount() int {
 	return len(s.prefer)
 }
 
-func (s *connectionsState) GetConnection(ctx context.Context) (_ conn.Conn, failedCount int) {
+func (s *connectionsState) GetConnection(ctx context.Context) (conn.Conn, int) {
+	var failedCount int
 	if err := ctx.Err(); err != nil {
 		return nil, 0
 	}
@@ -81,7 +82,8 @@ func (s *connectionsState) preferConnection(ctx context.Context) conn.Conn {
 	return nil
 }
 
-func (s *connectionsState) selectRandomConnection(conns []conn.Conn, allowBanned bool) (c conn.Conn, failedConns int) {
+func (s *connectionsState) selectRandomConnection(conns []conn.Conn, allowBanned bool) (conn.Conn, int) {
+	var failedConns int
 	connCount := len(conns)
 	if connCount == 0 {
 		// return for empty list need for prevent panic in fast path
@@ -113,7 +115,8 @@ func (s *connectionsState) selectRandomConnection(conns []conn.Conn, allowBanned
 	return nil, failedConns
 }
 
-func connsToNodeIDMap(conns []conn.Conn) (nodes map[uint32]conn.Conn) {
+func connsToNodeIDMap(conns []conn.Conn) map[uint32]conn.Conn {
+	var nodes map[uint32]conn.Conn
 	if len(conns) == 0 {
 		return nil
 	}
@@ -129,7 +132,8 @@ func sortPreferConnections(
 	filter balancerConfig.Filter,
 	info balancerConfig.Info,
 	allowFallback bool,
-) (prefer, fallback []conn.Conn) {
+) ([]conn.Conn, []conn.Conn) {
+	var prefer, fallback []conn.Conn
 	if filter == nil {
 		return conns, nil
 	}

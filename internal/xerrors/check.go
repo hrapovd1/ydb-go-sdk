@@ -6,10 +6,10 @@ import (
 
 // Check returns retry mode for err.
 func Check(err error) (
-	code int64,
-	errType Type,
-	backoffType backoff.Type,
-	deleteSession bool,
+	int64,
+	Type,
+	backoff.Type,
+	bool,
 ) {
 	if err == nil {
 		return -1,

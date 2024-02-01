@@ -88,15 +88,15 @@ type (
 type Method string
 
 // Name returns the rpc method name.
-func (m Method) Name() (s string) {
-	_, s = m.Split()
-	return
+func (m Method) Name() string {
+	_, s := m.Split()
+	return s
 }
 
 // Service returns the rpc service name.
-func (m Method) Service() (s string) {
-	s, _ = m.Split()
-	return
+func (m Method) Service() string {
+	s, _ := m.Split()
+	return s
 }
 
 // Issue declare interface of operation error issues
@@ -107,7 +107,7 @@ type Issue interface {
 }
 
 // Split returns service name and method.
-func (m Method) Split() (service, method string) {
+func (m Method) Split() (string, string) {
 	i := strings.LastIndex(string(m), "/")
 	if i == -1 {
 		return string(m), string(m)

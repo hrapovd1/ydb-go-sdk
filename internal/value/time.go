@@ -57,8 +57,11 @@ func TimestampToTime(n uint64) time.Time {
 	return time.Unix(int64(sec), int64(nsec))
 }
 
-func TzDateToTime(s string) (t time.Time, err error) {
-	ss := strings.Split(s, ",")
+func TzDateToTime(s string) (time.Time, error) {
+	var (
+		t  time.Time
+		ss = strings.Split(s, ",")
+	)
 	if len(ss) != 2 {
 		return t, xerrors.WithStackTrace(fmt.Errorf("not found timezone location in '%s'", s))
 	}
@@ -73,8 +76,11 @@ func TzDateToTime(s string) (t time.Time, err error) {
 	return t, nil
 }
 
-func TzDatetimeToTime(s string) (t time.Time, err error) {
-	ss := strings.Split(s, ",")
+func TzDatetimeToTime(s string) (time.Time, error) {
+	var (
+		t  time.Time
+		ss = strings.Split(s, ",")
+	)
 	if len(ss) != 2 {
 		return t, xerrors.WithStackTrace(fmt.Errorf("not found timezone location in '%s'", s))
 	}
@@ -89,8 +95,11 @@ func TzDatetimeToTime(s string) (t time.Time, err error) {
 	return t, nil
 }
 
-func TzTimestampToTime(s string) (t time.Time, err error) {
-	ss := strings.Split(s, ",")
+func TzTimestampToTime(s string) (time.Time, error) {
+	var (
+		t  time.Time
+		ss = strings.Split(s, ",")
+	)
 	if len(ss) != 2 {
 		return t, xerrors.WithStackTrace(fmt.Errorf("not found timezone location in '%s'", s))
 	}

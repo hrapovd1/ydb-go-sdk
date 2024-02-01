@@ -64,11 +64,11 @@ func (b *Balancer) OnUpdate(onApplyDiscoveredEndpoints func(ctx context.Context,
 	})
 }
 
-func (b *Balancer) clusterDiscovery(ctx context.Context) (err error) {
+func (b *Balancer) clusterDiscovery(ctx context.Context) error {
 	return retry.Retry(
 		repeater.WithEvent(ctx, repeater.EventInit),
-		func(childCtx context.Context) (err error) {
-			if err = b.clusterDiscoveryAttempt(childCtx); err != nil {
+		func(childCtx context.Context) error {
+			if err := b.clusterDiscoveryAttempt(childCtx); err != nil {
 				if credentials.IsAccessError(err) {
 					return credentials.AccessError("cluster discovery failed", err,
 						credentials.WithEndpoint(b.driverConfig.Endpoint()),
@@ -89,7 +89,7 @@ func (b *Balancer) clusterDiscovery(ctx context.Context) (err error) {
 	)
 }
 
-func (b *Balancer) clusterDiscoveryAttempt(ctx context.Context) (err error) {
+func (b *Balancer) clusterDiscoveryAttempt(ctx context.Context) error {
 	var (
 		address = "ydb:///" + b.driverConfig.Endpoint()
 		onDone  = trace.DriverOnBalancerClusterDiscoveryAttempt(
@@ -100,6 +100,7 @@ func (b *Balancer) clusterDiscoveryAttempt(ctx context.Context) (err error) {
 		endpoints []endpoint.Endpoint
 		localDC   string
 		cancel    context.CancelFunc
+		err       error
 	)
 	defer func() {
 		onDone(err)
@@ -130,14 +131,14 @@ func (b *Balancer) clusterDiscoveryAttempt(ctx context.Context) (err error) {
 }
 
 func endpointsDiff(newestEndpoints []endpoint.Endpoint, previousConns []conn.Conn) (
-	nodes []trace.EndpointInfo,
-	added []trace.EndpointInfo,
-	dropped []trace.EndpointInfo,
+	[]trace.EndpointInfo,
+	[]trace.EndpointInfo,
+	[]trace.EndpointInfo,
 ) {
-	nodes = make([]trace.EndpointInfo, 0, len(newestEndpoints))
-	added = make([]trace.EndpointInfo, 0, len(previousConns))
-	dropped = make([]trace.EndpointInfo, 0, len(previousConns))
 	var (
+		nodes       = make([]trace.EndpointInfo, 0, len(newestEndpoints))
+		added       = make([]trace.EndpointInfo, 0, len(previousConns))
+		dropped     = make([]trace.EndpointInfo, 0, len(previousConns))
 		newestMap   = make(map[string]struct{}, len(newestEndpoints))
 		previousMap = make(map[string]struct{}, len(previousConns))
 	)
@@ -204,7 +205,8 @@ func (b *Balancer) applyDiscoveredEndpoints(ctx context.Context, endpoints []end
 	})
 }
 
-func (b *Balancer) Close(ctx context.Context) (err error) {
+func (b *Balancer) Close(ctx context.Context) error {
+	var err error
 	onDone := trace.DriverOnBalancerClose(
 		b.driverConfig.Trace(), &ctx,
 		stack.FunctionID(""),
@@ -229,7 +231,7 @@ func New(
 	driverConfig *config.Config,
 	pool *conn.Pool,
 	opts ...discoveryConfig.Option,
-) (b *Balancer, finalErr error) {
+) (*Balancer, error) {
 	var (
 		onDone = trace.DriverOnBalancerInit(
 			driverConfig.Trace(), &ctx,
@@ -243,6 +245,8 @@ func New(
 			discoveryConfig.WithSecure(driverConfig.Secure()),
 			discoveryConfig.WithMeta(driverConfig.Meta()),
 		)...)
+		b        *Balancer
+		finalErr error
 	)
 	defer func() {
 		onDone(finalErr)
@@ -307,8 +311,11 @@ func (b *Balancer) NewStream(
 	desc *grpc.StreamDesc,
 	method string,
 	opts ...grpc.CallOption,
-) (_ grpc.ClientStream, err error) {
-	var client grpc.ClientStream
+) (grpc.ClientStream, error) {
+	var (
+		client grpc.ClientStream
+		err    error
+	)
 	err = b.wrapCall(ctx, func(ctx context.Context, cc conn.Conn) error {
 		client, err = cc.NewStream(ctx, desc, method, opts...)
 		return err
@@ -319,7 +326,7 @@ func (b *Balancer) NewStream(
 	return nil, err
 }
 
-func (b *Balancer) wrapCall(ctx context.Context, f func(ctx context.Context, cc conn.Conn) error) (err error) {
+func (b *Balancer) wrapCall(ctx context.Context, f func(ctx context.Context, cc conn.Conn) error) error {
 	cc, err := b.getConn(ctx)
 	if err != nil {
 		return xerrors.WithStackTrace(err)
@@ -363,7 +370,11 @@ func (b *Balancer) connections() *connectionsState {
 	return b.connectionsState
 }
 
-func (b *Balancer) getConn(ctx context.Context) (c conn.Conn, err error) {
+func (b *Balancer) getConn(ctx context.Context) (conn.Conn, error) {
+	var (
+		c   conn.Conn
+		err error
+	)
 	onDone := trace.DriverOnBalancerChooseEndpoint(
 		b.driverConfig.Trace(), &ctx,
 		stack.FunctionID(""),

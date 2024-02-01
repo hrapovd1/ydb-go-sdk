@@ -21,7 +21,7 @@ func (c isDirectoryExistsSchemeClient) Database() string {
 }
 
 func (c isDirectoryExistsSchemeClient) ListDirectory(ctx context.Context, path string) (
-	d scheme.Directory, err error,
+	scheme.Directory, error,
 ) {
 	if c.existingPath == path {
 		return scheme.Directory{
@@ -46,7 +46,7 @@ func (c isDirectoryExistsSchemeClient) ListDirectory(ctx context.Context, path s
 			},
 		}, nil
 	}
-	return d, fmt.Errorf("path '%s' not found in '%s'", path, c)
+	return scheme.Directory{}, fmt.Errorf("path '%s' not found in '%s'", path, c)
 }
 
 func TestIsDirectoryExists(t *testing.T) {
@@ -133,7 +133,7 @@ func (c isTableExistsSchemeClient) Database() string {
 }
 
 func (c isTableExistsSchemeClient) ListDirectory(ctx context.Context, path string) (
-	d scheme.Directory, err error,
+	scheme.Directory, error,
 ) {
 	if strings.HasPrefix(c.tablePath, path) {
 		children := strings.Split(strings.TrimLeft(c.tablePath, path), "/")
@@ -173,7 +173,7 @@ func (c isTableExistsSchemeClient) ListDirectory(ctx context.Context, path strin
 			}, nil
 		}
 	}
-	return d, fmt.Errorf("path '%s' not found in '%s'", path, c)
+	return scheme.Directory{}, fmt.Errorf("path '%s' not found in '%s'", path, c)
 }
 
 func TestIsTableExists(t *testing.T) {

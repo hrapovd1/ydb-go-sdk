@@ -19,7 +19,7 @@ func CastTo(v Value, dst interface{}) error {
 }
 
 // IsOptional checks if type is optional and returns innerType if it is.
-func IsOptional(t Type) (isOptional bool, innerType Type) {
+func IsOptional(t Type) (bool, Type) {
 	if optionalType, isOptional := t.(interface {
 		IsOptional()
 		InnerType() Type
@@ -72,7 +72,7 @@ func StructFields(v Value) (map[string]Value, error) {
 }
 
 // VariantValue returns variant value from abstract Value
-func VariantValue(v Value) (name string, idx uint32, _ Value, _ error) {
+func VariantValue(v Value) (string, uint32, Value, error) {
 	if vv, has := v.(interface {
 		Variant() (name string, index uint32)
 		Value() Value

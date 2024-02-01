@@ -443,8 +443,8 @@ func valueFromPrimitiveTypeID(c *column, r xrand.Rand) (*Ydb.Value, interface{})
 	}
 }
 
-func getResultSet(count int, col []*column) (result *Ydb.ResultSet, testValues [][]indexed.RequiredOrOptional) {
-	result = &Ydb.ResultSet{}
+func getResultSet(count int, col []*column) (*Ydb.ResultSet, [][]indexed.RequiredOrOptional) {
+	result := &Ydb.ResultSet{}
 	for _, c := range col {
 		t := &Ydb.Type{
 			Type: &Ydb.Type_TypeId{
@@ -470,7 +470,7 @@ func getResultSet(count int, col []*column) (result *Ydb.ResultSet, testValues [
 	}
 
 	r := xrand.New(xrand.WithLock())
-	testValues = make([][]indexed.RequiredOrOptional, count)
+	testValues := make([][]indexed.RequiredOrOptional, count)
 	for i := 0; i < count; i++ {
 		var items []*Ydb.Value
 		var vals []indexed.RequiredOrOptional
@@ -495,7 +495,8 @@ func TestScanSqlTypes(t *testing.T) {
 			s.reset(set, test.setColumns...)
 			for s.NextRow() {
 				if test.columns[0].testDefault {
-					if err := s.ScanWithDefaults(func() (values []indexed.Required) {
+					if err := s.ScanWithDefaults(func() []indexed.Required {
+						var values []indexed.Required
 						for _, v := range test.values {
 							values = append(values, v)
 						}
