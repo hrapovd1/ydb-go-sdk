@@ -158,6 +158,7 @@ func (m *PublicBatch) cutMessages(count int) (*PublicBatch, *PublicBatch) {
 		// explicit 0 need for prevent typos, when type slice[count:count] instead of slice[:count:count]
 		head, _ := newBatch(m.commitRange.partitionSession, m.Messages[0:count:count])
 		rest, _ := newBatch(m.commitRange.partitionSession, m.Messages[count:])
+
 		return head, rest
 	}
 }

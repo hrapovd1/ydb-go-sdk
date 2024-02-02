@@ -56,6 +56,7 @@ func (c *Client) Execute(
 	}
 	if !c.config.AutoRetry() {
 		err = call(ctx)
+
 		return r, err
 	}
 	err = retry.Retry(ctx, call,
@@ -139,6 +140,7 @@ func (c *Client) Explain(
 	}
 	if !c.config.AutoRetry() {
 		err = call(ctx)
+
 		return e, err
 	}
 	err = retry.Retry(ctx, call,
@@ -219,6 +221,7 @@ func (c *Client) StreamExecute(
 	}
 	if !c.config.AutoRetry() {
 		err = call(ctx)
+
 		return r, err
 	}
 	err = retry.Retry(ctx, call,

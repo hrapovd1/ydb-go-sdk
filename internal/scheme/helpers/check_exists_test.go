@@ -47,6 +47,7 @@ func (c isDirectoryExistsSchemeClient) ListDirectory(ctx context.Context, path s
 			},
 		}, nil
 	}
+
 	return scheme.Directory{}, fmt.Errorf("path '%s' not found in '%s'", path, c)
 }
 
@@ -174,6 +175,7 @@ func (c isTableExistsSchemeClient) ListDirectory(ctx context.Context, path strin
 			}, nil
 		}
 	}
+
 	return scheme.Directory{}, fmt.Errorf("path '%s' not found in '%s'", path, c)
 }
 

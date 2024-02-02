@@ -140,6 +140,7 @@ func (c *Client) ListDirectory(ctx context.Context, path string) (scheme.Directo
 	}()
 	call := func(ctx context.Context) error {
 		d, finalErr = c.listDirectory(ctx, path)
+
 		return xerrors.WithStackTrace(finalErr)
 	}
 	if !c.config.AutoRetry() {

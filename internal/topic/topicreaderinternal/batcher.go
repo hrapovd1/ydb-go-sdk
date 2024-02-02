@@ -127,6 +127,7 @@ func (o batcherGetOptions) cutBatchItemsHead(items batcherMessageOrderItems) (
 
 		head := newBatcherItemBatch(batchHead)
 		rest := items.ReplaceHeadItem(newBatcherItemBatch(batchRest))
+
 		return head, rest, true
 	}
 
@@ -147,6 +148,7 @@ func (o batcherGetOptions) splitBatch(batch *PublicBatch) (*PublicBatch, *Public
 	}
 
 	head, rest := batch.cutMessages(o.MaxCount)
+
 	return head, rest, true
 }
 

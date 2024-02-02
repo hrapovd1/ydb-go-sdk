@@ -89,6 +89,7 @@ func (c *Client) createResource(
 			operation.ModeSync,
 		),
 	})
+
 	return err
 }
 
@@ -137,6 +138,7 @@ func (c *Client) alterResource(
 			operation.ModeSync,
 		),
 	})
+
 	return err
 }
 
@@ -177,6 +179,7 @@ func (c *Client) dropResource(
 			operation.ModeSync,
 		),
 	})
+
 	return err
 }
 
@@ -190,7 +193,8 @@ func (c *Client) ListResource(
 	if c == nil {
 		return list, xerrors.WithStackTrace(errNilClient)
 	}
-	call := func(ctx context.Context) (err error) {
+	call := func(ctx context.Context) error {
+		var err error
 		list, err = c.listResource(ctx, coordinationNodePath, resourcePath, recursive)
 
 		return xerrors.WithStackTrace(err)
@@ -260,6 +264,7 @@ func (c *Client) DescribeResource(
 	}
 	if !c.config.AutoRetry() {
 		err = call(ctx)
+
 		return resource, err
 	}
 	err = retry.Retry(ctx, call,
@@ -267,6 +272,7 @@ func (c *Client) DescribeResource(
 		retry.WithStackTrace(),
 		retry.WithTrace(c.config.TraceRetry()),
 	)
+
 	return resource, err
 }
 

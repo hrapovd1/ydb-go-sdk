@@ -14,7 +14,7 @@ func (m AutoDeclare) blockID() blockID {
 }
 
 func (m AutoDeclare) RewriteQuery(query string, args ...interface{}) (
-	yql string, newArgs []interface{}, err error,
+	string, []interface{}, error,
 ) {
 	params, err := Params(args...)
 	if err != nil {
@@ -28,6 +28,7 @@ func (m AutoDeclare) RewriteQuery(query string, args ...interface{}) (
 	var (
 		declares = make([]string, 0, len(params))
 		buffer   = xstring.Buffer()
+		newArgs  = make([]interface{}, 0, len(params))
 	)
 	defer buffer.Free()
 

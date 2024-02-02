@@ -501,6 +501,7 @@ func (s *scanner) unwrapValue() *Ydb.Value {
 	x, _ := s.stack.currentValue().(*Ydb.Value_NestedValue)
 	if x == nil {
 		s.valueTypeError(s.stack.currentValue(), x)
+
 		return &Ydb.Value{}
 	}
 
@@ -530,6 +531,7 @@ func (s *scanner) assertTypeDecimal(typ *Ydb.Type) *Ydb.Type_DecimalType {
 	if t, _ = x.(*Ydb.Type_DecimalType); t == nil {
 		s.typeError(x, t)
 	}
+
 	return t
 }
 
@@ -537,6 +539,7 @@ func (s *scanner) bool() bool {
 	x, _ := s.stack.currentValue().(*Ydb.Value_BoolValue)
 	if x == nil {
 		s.valueTypeError(s.stack.currentValue(), x)
+
 		return false
 	}
 
@@ -548,6 +551,7 @@ func (s *scanner) int8() int8 {
 	d := s.int32()
 	if d < math.MinInt8 || math.MaxInt8 < d {
 		_ = s.overflowError(d, v)
+
 		return v
 	}
 
@@ -559,6 +563,7 @@ func (s *scanner) uint8() uint8 {
 	d := s.uint32()
 	if d > math.MaxUint8 {
 		_ = s.overflowError(d, v)
+
 		return v
 	}
 
@@ -570,6 +575,7 @@ func (s *scanner) int16() int16 {
 	d := s.int32()
 	if d < math.MinInt16 || math.MaxInt16 < d {
 		_ = s.overflowError(d, v)
+
 		return v
 	}
 
@@ -581,6 +587,7 @@ func (s *scanner) uint16() uint16 {
 	d := s.uint32()
 	if d > math.MaxUint16 {
 		_ = s.overflowError(d, v)
+
 		return v
 	}
 
@@ -592,6 +599,7 @@ func (s *scanner) int32() int32 {
 	x, _ := s.stack.currentValue().(*Ydb.Value_Int32Value)
 	if x == nil {
 		s.valueTypeError(s.stack.currentValue(), x)
+
 		return v
 	}
 
@@ -603,6 +611,7 @@ func (s *scanner) uint32() uint32 {
 	x, _ := s.stack.currentValue().(*Ydb.Value_Uint32Value)
 	if x == nil {
 		s.valueTypeError(s.stack.currentValue(), x)
+
 		return v
 	}
 
@@ -614,6 +623,7 @@ func (s *scanner) int64() int64 {
 	x, _ := s.stack.currentValue().(*Ydb.Value_Int64Value)
 	if x == nil {
 		s.valueTypeError(s.stack.currentValue(), x)
+
 		return v
 	}
 
@@ -625,6 +635,7 @@ func (s *scanner) uint64() uint64 {
 	x, _ := s.stack.currentValue().(*Ydb.Value_Uint64Value)
 	if x == nil {
 		s.valueTypeError(s.stack.currentValue(), x)
+
 		return v
 	}
 
@@ -636,6 +647,7 @@ func (s *scanner) float() float32 {
 	x, _ := s.stack.currentValue().(*Ydb.Value_FloatValue)
 	if x == nil {
 		s.valueTypeError(s.stack.currentValue(), x)
+
 		return v
 	}
 
@@ -647,6 +659,7 @@ func (s *scanner) double() float64 {
 	x, _ := s.stack.currentValue().(*Ydb.Value_DoubleValue)
 	if x == nil {
 		s.valueTypeError(s.stack.currentValue(), x)
+
 		return v
 	}
 
@@ -658,6 +671,7 @@ func (s *scanner) bytes() []byte {
 	x, _ := s.stack.currentValue().(*Ydb.Value_BytesValue)
 	if x == nil {
 		s.valueTypeError(s.stack.currentValue(), x)
+
 		return v
 	}
 
@@ -669,6 +683,7 @@ func (s *scanner) text() string {
 	x, _ := s.stack.currentValue().(*Ydb.Value_TextValue)
 	if x == nil {
 		s.valueTypeError(s.stack.currentValue(), x)
+
 		return v
 	}
 
@@ -680,6 +695,7 @@ func (s *scanner) low128() uint64 {
 	x, _ := s.stack.currentValue().(*Ydb.Value_Low_128)
 	if x == nil {
 		s.valueTypeError(s.stack.currentValue(), x)
+
 		return v
 	}
 
@@ -691,6 +707,7 @@ func (s *scanner) uint128() [16]byte {
 	c := s.stack.current()
 	if c.isEmpty() {
 		_ = s.errorf(0, "not implemented convert to [16]byte")
+
 		return v
 	}
 	lo := s.low128()

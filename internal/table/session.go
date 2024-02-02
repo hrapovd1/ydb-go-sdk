@@ -486,6 +486,7 @@ func (s *session) DropTable(
 		}
 	}
 	_, err := s.tableService.DropTable(ctx, &request)
+
 	return xerrors.WithStackTrace(err)
 }
 
@@ -524,6 +525,7 @@ func (s *session) AlterTable(
 		}
 	}
 	_, err := s.tableService.AlterTable(ctx, &request)
+
 	return xerrors.WithStackTrace(err)
 }
 
@@ -850,6 +852,7 @@ func (s *session) ExecuteSchemeQuery(
 		}
 	}
 	_, err := s.tableService.ExecuteSchemeQuery(ctx, &request)
+
 	return xerrors.WithStackTrace(err)
 }
 

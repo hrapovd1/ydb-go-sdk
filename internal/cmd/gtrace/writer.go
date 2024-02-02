@@ -179,6 +179,7 @@ func unwrapStruct(t types.Type) (*types.Named, *types.Struct) {
 	if ok {
 		s, _ = n.Underlying().(*types.Struct)
 	}
+
 	return n, s
 }
 
@@ -776,6 +777,7 @@ func (w *Writer) funcParams(params []Param) []string {
 		vars = append(vars, w.funcParam(&params[i]))
 	}
 	w.code(`)`)
+
 	return vars
 }
 

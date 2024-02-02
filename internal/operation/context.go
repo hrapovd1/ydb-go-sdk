@@ -37,6 +37,7 @@ func WithCancelAfter(ctx context.Context, operationCancelAfter time.Duration) co
 // YDB should try to cancel operation and return result regardless of the cancelation.
 func Timeout(ctx context.Context) (time.Duration, bool) {
 	d, ok := ctx.Value(ctxOperationTimeoutKey{}).(time.Duration)
+
 	return d, ok
 }
 
@@ -44,6 +45,7 @@ func Timeout(ctx context.Context) (time.Duration, bool) {
 // YDB should try to cancel operation and return result regardless of the cancellation.
 func CancelAfter(ctx context.Context) (time.Duration, bool) {
 	d, ok := ctx.Value(ctxOperationCancelAfterKey{}).(time.Duration)
+
 	return d, ok
 }
 

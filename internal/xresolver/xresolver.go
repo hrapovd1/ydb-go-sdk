@@ -40,6 +40,7 @@ func (c *clientConn) UpdateState(state resolver.State) error {
 			for i := range state.Addresses {
 				addrs = append(addrs, state.Addresses[i].Addr)
 			}
+
 			return addrs
 		}(),
 	)

@@ -334,6 +334,7 @@ func (s *rawConverter) ListIn() int {
 	if s.assertTypeList(x.t) != nil {
 		return s.itemsIn()
 	}
+
 	return v
 }
 
@@ -373,6 +374,7 @@ func (s *rawConverter) TupleIn() int {
 	if s.assertTypeTuple(x.t) != nil {
 		return s.itemsIn()
 	}
+
 	return v
 }
 
@@ -412,6 +414,7 @@ func (s *rawConverter) StructIn() int {
 	if s.assertTypeStruct(x.t) != nil {
 		return s.itemsIn()
 	}
+
 	return v
 }
 
@@ -434,6 +437,7 @@ func (s *rawConverter) StructField(i int) string {
 			v:    p.v.Items[i],
 		})
 	}
+
 	return name
 }
 
@@ -456,6 +460,7 @@ func (s *rawConverter) DictIn() int {
 	if s.assertTypeDict(x.t) != nil {
 		return s.pairsIn()
 	}
+
 	return v
 }
 
@@ -612,6 +617,7 @@ func (s *rawConverter) unwrapVariantType(typ *Ydb.Type_VariantType, index uint32
 	case *Ydb.VariantType_TupleItems:
 		if i >= len(x.TupleItems.Elements) {
 			_ = s.errorf(0, "unimplemented")
+
 			return "", &t
 		}
 
@@ -620,6 +626,7 @@ func (s *rawConverter) unwrapVariantType(typ *Ydb.Type_VariantType, index uint32
 	case *Ydb.VariantType_StructItems:
 		if i >= len(x.StructItems.Members) {
 			_ = s.errorf(0, "unimplemented")
+
 			return "", &t
 		}
 		m := x.StructItems.Members[i]
@@ -638,6 +645,7 @@ func (s *rawConverter) variant() (*Ydb.Value, uint32) {
 	}
 	x := s.stack.current() // Is not nil if unwrapValue succeeded.
 	index := x.v.VariantIndex
+
 	return v, index
 }
 
@@ -692,6 +700,7 @@ func (s *scanner) assertTypeOptional(typ *Ydb.Type) *Ydb.Type_OptionalType {
 	if t, _ := x.(*Ydb.Type_OptionalType); t == nil {
 		s.typeError(x, t)
 	}
+
 	return &Ydb.Type_OptionalType{}
 }
 
@@ -755,6 +764,7 @@ func (s *rawConverter) assertTypeList(typ *Ydb.Type) *Ydb.Type_ListType {
 	if t, _ := x.(*Ydb.Type_ListType); t == nil {
 		s.typeError(x, t)
 	}
+
 	return &Ydb.Type_ListType{}
 }
 
@@ -763,6 +773,7 @@ func (s *rawConverter) assertTypeTuple(typ *Ydb.Type) *Ydb.Type_TupleType {
 	if t, _ := x.(*Ydb.Type_TupleType); t == nil {
 		s.typeError(x, t)
 	}
+
 	return &Ydb.Type_TupleType{}
 }
 
@@ -771,6 +782,7 @@ func (s *rawConverter) assertTypeStruct(typ *Ydb.Type) *Ydb.Type_StructType {
 	if t, _ := x.(*Ydb.Type_StructType); t == nil {
 		s.typeError(x, t)
 	}
+
 	return &Ydb.Type_StructType{}
 }
 
@@ -779,6 +791,7 @@ func (s *rawConverter) assertTypeDict(typ *Ydb.Type) *Ydb.Type_DictType {
 	if t, _ := x.(*Ydb.Type_DictType); t == nil {
 		s.typeError(x, t)
 	}
+
 	return &Ydb.Type_DictType{}
 }
 
@@ -787,6 +800,7 @@ func (s *rawConverter) assertTypeDecimal(typ *Ydb.Type) *Ydb.Type_DecimalType {
 	if t, _ := x.(*Ydb.Type_DecimalType); t == nil {
 		s.typeError(x, t)
 	}
+
 	return &Ydb.Type_DecimalType{}
 }
 
@@ -795,6 +809,7 @@ func (s *rawConverter) assertTypeVariant(typ *Ydb.Type) *Ydb.Type_VariantType {
 	if t, _ := x.(*Ydb.Type_VariantType); t == nil {
 		s.typeError(x, t)
 	}
+
 	return &Ydb.Type_VariantType{}
 }
 

@@ -42,5 +42,6 @@ func LoadCertificatesFromPem(bytes []byte) []*x509.Certificate {
 		}
 		certs = append(certs, cert)
 	}
+
 	return certs
 }

@@ -31,6 +31,7 @@ func do(
 	opts ...retry.Option,
 ) error {
 	var err error
+
 	return retryBackoff(ctx, c,
 		func(ctx context.Context, s table.Session) error {
 			defer func() {
@@ -68,6 +69,7 @@ func retryBackoff(
 	opts ...retry.Option,
 ) error {
 	var err error
+
 	return retry.Retry(ctx,
 		func(ctx context.Context) error {
 			var s *session

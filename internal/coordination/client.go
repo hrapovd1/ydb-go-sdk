@@ -179,6 +179,7 @@ func (c *Client) DescribeNode(
 	}
 	if !c.config.AutoRetry() {
 		err = call(ctx)
+
 		return entry, config, xerrors.WithStackTrace(err)
 	}
 	err = retry.Retry(ctx, call,

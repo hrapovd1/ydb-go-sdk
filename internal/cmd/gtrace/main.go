@@ -343,6 +343,7 @@ func splitOSArchTags(ctx *build.Context, name string) (string, string, string) {
 			len(fileTags),
 		))
 	}
+
 	return base, tags, ext
 }
 
