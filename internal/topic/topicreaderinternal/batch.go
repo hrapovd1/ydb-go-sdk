@@ -143,6 +143,7 @@ func (m *PublicBatch) append(b *PublicBatch) (*PublicBatch, error) {
 
 	res.Messages = append(res.Messages, b.Messages...)
 	res.commitRange.commitOffsetEnd = b.commitRange.commitOffsetEnd
+
 	return res, nil
 }
 
@@ -175,9 +176,11 @@ func splitBytesByMessagesInBatches(batches []*PublicBatch, totalBytesCount int) 
 		case want >= restBytes:
 			res := restBytes
 			restBytes = 0
+
 			return res
 		default:
 			restBytes -= want
+
 			return want
 		}
 	}

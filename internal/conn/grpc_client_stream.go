@@ -37,6 +37,7 @@ func (s *grpcClientStream) CloseSend() error {
 				),
 			)
 		}
+
 		return s.wrapError(err)
 	}
 
@@ -63,6 +64,7 @@ func (s *grpcClientStream) SendMsg(m interface{}) error {
 					xerrors.WithName("SendMsg"),
 				))
 			}
+
 			return s.wrapError(err)
 		}
 
@@ -104,6 +106,7 @@ func (s *grpcClientStream) RecvMsg(m interface{}) error {
 					xerrors.WithName("RecvMsg"),
 				))
 			}
+
 			return s.wrapError(err)
 		}
 
@@ -132,6 +135,7 @@ func (s *grpcClientStream) wrapError(err error) error {
 	}
 
 	nodeErr := newConnError(s.c.endpoint.NodeID(), s.c.endpoint.Address(), err)
+
 	return xerrors.WithStackTrace(nodeErr, xerrors.WithSkipDepth(1))
 }
 
@@ -145,6 +149,7 @@ func createPinger(c *conn) context.CancelFunc {
 			select {
 			case <-ctxDone:
 				ticker.Stop()
+
 				return
 			case <-ticker.C:
 				c.touchLastUsage()

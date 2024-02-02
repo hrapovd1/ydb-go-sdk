@@ -46,6 +46,7 @@ func (b *batcher) Close(err error) error {
 	b.closed = true
 	b.closeErr = err
 	close(b.closeChan)
+
 	return nil
 }
 
@@ -174,6 +175,7 @@ func (b *batcher) Pop(ctx context.Context, opts batcherGetOptions) (batcherMessa
 			findRes = b.findNeedLock(opts)
 			if findRes.Ok {
 				b.applyNeedLock(findRes)
+
 				return
 			}
 		})
@@ -271,6 +273,7 @@ func (b *batcher) applyForceFlagToOptions(options batcherGetOptions) batcherGetO
 
 	res := options
 	res.MinCount = 1
+
 	return res
 }
 
@@ -310,6 +313,7 @@ func (items batcherMessageOrderItems) Append(item batcherMessageOrderItem) (batc
 		} else {
 			return nil, err
 		}
+
 		return items, nil
 	}
 
@@ -328,6 +332,7 @@ func (items batcherMessageOrderItems) ReplaceHeadItem(item batcherMessageOrderIt
 	res := make(batcherMessageOrderItems, len(items))
 	res[0] = item
 	copy(res[1:], items[1:])
+
 	return res
 }
 

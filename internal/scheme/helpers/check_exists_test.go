@@ -33,6 +33,7 @@ func (c isDirectoryExistsSchemeClient) ListDirectory(ctx context.Context, path s
 	}
 	if strings.HasPrefix(c.existingPath, path) {
 		children := strings.Split(strings.TrimLeft(c.existingPath, path), "/")
+
 		return scheme.Directory{
 			Entry: scheme.Entry{
 				Name: path,

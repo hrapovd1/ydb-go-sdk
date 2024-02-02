@@ -33,6 +33,7 @@ func internalRetry(l *wrapper, d trace.Detailer) trace.Retry {
 			Bool("idempotent", idempotent),
 		)
 		start := time.Now()
+
 		return func(info trace.RetryLoopIntermediateInfo) func(trace.RetryLoopDoneInfo) {
 			if info.Error == nil {
 				l.Log(ctx, "attempt done",
@@ -55,6 +56,7 @@ func internalRetry(l *wrapper, d trace.Detailer) trace.Retry {
 					versionField(),
 				)
 			}
+
 			return func(info trace.RetryLoopDoneInfo) {
 				if info.Error == nil {
 					l.Log(ctx, "done",
@@ -82,5 +84,6 @@ func internalRetry(l *wrapper, d trace.Detailer) trace.Retry {
 			}
 		}
 	}
+
 	return t
 }

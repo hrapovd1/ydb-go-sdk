@@ -57,6 +57,7 @@ func newTopicConfig(opts ...topicoptions.TopicOption) topic.Config {
 			o(&c)
 		}
 	}
+
 	return c
 }
 
@@ -78,6 +79,7 @@ func (c *Client) Alter(ctx context.Context, path string, opts ...topicoptions.Al
 
 	call := func(ctx context.Context) error {
 		_, alterErr := c.rawClient.AlterTopic(ctx, req)
+
 		return alterErr
 	}
 
@@ -109,6 +111,7 @@ func (c *Client) Create(
 
 	call := func(ctx context.Context) error {
 		_, createErr := c.rawClient.CreateTopic(ctx, req)
+
 		return createErr
 	}
 
@@ -147,6 +150,7 @@ func (c *Client) Describe(
 
 	call := func(ctx context.Context) error {
 		rawRes, describeErr = c.rawClient.DescribeTopic(ctx, req)
+
 		return describeErr
 	}
 
@@ -166,6 +170,7 @@ func (c *Client) Describe(
 	}
 
 	res.FromRaw(&rawRes)
+
 	return res, nil
 }
 
@@ -183,6 +188,7 @@ func (c *Client) Drop(ctx context.Context, path string, opts ...topicoptions.Dro
 
 	call := func(ctx context.Context) error {
 		_, removeErr := c.rawClient.DropTopic(ctx, req)
+
 		return removeErr
 	}
 
@@ -219,6 +225,7 @@ func (c *Client) StartReader(
 
 	internalReader := topicreaderinternal.NewReader(connector, consumer, readSelectors, opts...)
 	trace.TopicOnReaderStart(internalReader.Tracer(), internalReader.ID(), consumer)
+
 	return topicreader.NewReader(internalReader), nil
 }
 
@@ -244,5 +251,6 @@ func (c *Client) StartWriter(topicPath string, opts ...topicoptions.WriterOption
 	if err != nil {
 		return nil, err
 	}
+
 	return topicwriter.NewWriter(writer), nil
 }

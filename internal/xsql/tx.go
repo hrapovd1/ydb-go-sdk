@@ -49,6 +49,7 @@ func (c *conn) beginTx(ctx context.Context, txOptions driver.TxOptions) (current
 		txCtx: ctx,
 		tx:    transaction,
 	}
+
 	return c.currentTx, nil
 }
 
@@ -65,6 +66,7 @@ func (tx *tx) checkTxState() error {
 			tx.ID(), tx.conn.ID(),
 		)
 	}
+
 	return fmt.Errorf("broken conn state: tx=%s not related to conn=%q (conn have current tx=%q)",
 		tx.conn.currentTx.ID(), tx.conn.ID(), tx.ID(),
 	)
@@ -91,6 +93,7 @@ func (tx *tx) Commit() error {
 	if err != nil {
 		return badconn.Map(xerrors.WithStackTrace(err))
 	}
+
 	return nil
 }
 
@@ -115,6 +118,7 @@ func (tx *tx) Rollback() error {
 	if err != nil {
 		return badconn.Map(xerrors.WithStackTrace(err))
 	}
+
 	return err
 }
 
@@ -156,6 +160,7 @@ func (tx *tx) QueryContext(ctx context.Context, query string, args []driver.Name
 	if err = res.Err(); err != nil {
 		return nil, badconn.Map(xerrors.WithStackTrace(err))
 	}
+
 	return &rows{
 		conn:   tx.conn,
 		result: res,
@@ -197,6 +202,7 @@ func (tx *tx) ExecContext(ctx context.Context, query string, args []driver.Named
 	if err != nil {
 		return nil, badconn.Map(xerrors.WithStackTrace(err))
 	}
+
 	return resultNoRows{}, nil
 }
 
@@ -214,6 +220,7 @@ func (tx *tx) PrepareContext(ctx context.Context, query string) (driver.Stmt, er
 	if !tx.conn.isReady() {
 		return nil, badconn.Map(xerrors.WithStackTrace(errNotReadyConn))
 	}
+
 	return &stmt{
 		conn:      tx.conn,
 		processor: tx,

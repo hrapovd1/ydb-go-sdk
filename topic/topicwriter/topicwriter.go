@@ -50,6 +50,7 @@ func (w *Writer) WaitInit(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
 
@@ -61,6 +62,7 @@ func (w *Writer) WaitInitInfo(ctx context.Context) (PublicInitialInfo, error) {
 		return PublicInitialInfo{}, err
 	}
 	publicInfo := PublicInitialInfo{LastSeqNum: privateInfo.LastSeqNum}
+
 	return publicInfo, nil
 }
 

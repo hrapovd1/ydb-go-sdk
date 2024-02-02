@@ -17,6 +17,7 @@ func WithTimeout(ctx context.Context, operationTimeout time.Duration) context.Co
 		// The current cancelation timeout is already smaller than the new one.
 		return ctx
 	}
+
 	return context.WithValue(ctx, ctxOperationTimeoutKey{}, operationTimeout)
 }
 
@@ -28,6 +29,7 @@ func WithCancelAfter(ctx context.Context, operationCancelAfter time.Duration) co
 		// The current cancelation timeout is already smaller than the new one.
 		return ctx
 	}
+
 	return context.WithValue(ctx, ctxOperationCancelAfterKey{}, operationCancelAfter)
 }
 
@@ -50,5 +52,6 @@ func untilDeadline(ctx context.Context) (time.Duration, bool) {
 	if ok {
 		return time.Until(deadline), true
 	}
+
 	return 0, false
 }

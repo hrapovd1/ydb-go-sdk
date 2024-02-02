@@ -83,6 +83,7 @@ func Parse(dataSourceName string) ([]config.Option, []ConnectorOption, error) {
 		}
 		connectorOpts = append(connectorOpts, binders...)
 	}
+
 	return opts, connectorOpts, nil
 }
 
@@ -96,5 +97,6 @@ func extractTablePathPrefixFromBinderName(binderName string) (string, error) {
 	if len(ss) != 1 || len(ss[0]) != 2 || ss[0][1] == "" {
 		return "", xerrors.WithStackTrace(fmt.Errorf("%w: %s", errWrongTablePathPrefix, binderName))
 	}
+
 	return ss[0][1], nil
 }

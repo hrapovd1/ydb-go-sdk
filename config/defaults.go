@@ -65,6 +65,7 @@ func defaultGrpcOptions(t *trace.Driver, secure bool, tlsConfig *tls.Config) []g
 			insecure.NewCredentials(),
 		))
 	}
+
 	return opts
 }
 
@@ -73,6 +74,7 @@ func certPool() *x509.CertPool {
 	if err == nil {
 		return certPool
 	}
+
 	return x509.NewCertPool()
 }
 

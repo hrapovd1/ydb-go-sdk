@@ -51,6 +51,7 @@ func (c *Client) Execute(
 	}
 	call := func(ctx context.Context) error {
 		r, err = c.execute(ctx, query, params)
+
 		return xerrors.WithStackTrace(err)
 	}
 	if !c.config.AutoRetry() {
@@ -61,6 +62,7 @@ func (c *Client) Execute(
 		retry.WithStackTrace(),
 		retry.WithTrace(c.config.TraceRetry()),
 	)
+
 	return r, xerrors.WithStackTrace(err)
 }
 
@@ -103,6 +105,7 @@ func (c *Client) execute(
 	if err != nil {
 		return nil, xerrors.WithStackTrace(err)
 	}
+
 	return scanner.NewUnary(result.GetResultSets(), result.GetQueryStats()), nil
 }
 
@@ -131,6 +134,7 @@ func (c *Client) Explain(
 	}
 	call := func(ctx context.Context) error {
 		e, err = c.explain(ctx, query, mode)
+
 		return xerrors.WithStackTrace(err)
 	}
 	if !c.config.AutoRetry() {
@@ -142,6 +146,7 @@ func (c *Client) Explain(
 		retry.WithIdempotent(true),
 		retry.WithTrace(c.config.TraceRetry()),
 	)
+
 	return e, xerrors.WithStackTrace(err)
 }
 
@@ -191,6 +196,7 @@ func (c *Client) explain(
 	for k, v := range result.GetParametersTypes() {
 		e.ParameterTypes[k] = value.TypeFromYDB(v)
 	}
+
 	return e, nil
 }
 
@@ -208,6 +214,7 @@ func (c *Client) StreamExecute(
 	}
 	call := func(ctx context.Context) error {
 		r, err = c.streamExecute(ctx, query, params)
+
 		return xerrors.WithStackTrace(err)
 	}
 	if !c.config.AutoRetry() {
@@ -218,6 +225,7 @@ func (c *Client) StreamExecute(
 		retry.WithStackTrace(),
 		retry.WithTrace(c.config.TraceRetry()),
 	)
+
 	return r, xerrors.WithStackTrace(err)
 }
 
@@ -256,6 +264,7 @@ func (c *Client) streamExecute(
 	stream, err := c.service.StreamExecuteYql(ctx, request)
 	if err != nil {
 		cancel()
+
 		return nil, xerrors.WithStackTrace(err)
 	}
 
@@ -278,12 +287,14 @@ func (c *Client) streamExecute(
 				if result == nil || err != nil {
 					return nil, nil, xerrors.WithStackTrace(err)
 				}
+
 				return result.GetResultSet(), result.GetQueryStats(), nil
 			}
 		},
 		func(err error) error {
 			cancel()
 			onIntermediate(xerrors.HideEOF(err))(xerrors.HideEOF(err))
+
 			return err
 		},
 	)
@@ -298,6 +309,7 @@ func (c *Client) Close(ctx context.Context) error {
 	defer func() {
 		onDone(err)
 	}()
+
 	return nil
 }
 

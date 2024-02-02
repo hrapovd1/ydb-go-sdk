@@ -21,5 +21,6 @@ func ConsumedUnits(md metadata.MD) uint64 {
 			}
 		}
 	}
+
 	return consumedUnits
 }

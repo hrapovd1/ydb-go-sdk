@@ -239,6 +239,7 @@ linters:
     - maintidx
     - maligned
     - nlreturn
+    - nonamedreturns
     - paralleltest
     - protogetter
     - scopelint

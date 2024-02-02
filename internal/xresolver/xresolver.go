@@ -27,6 +27,7 @@ func (c *clientConn) Endpoint() string {
 	if endpoint == "" {
 		endpoint = c.target.URL.Opaque
 	}
+
 	return strings.TrimPrefix(endpoint, "/")
 }
 

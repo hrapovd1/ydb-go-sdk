@@ -70,9 +70,11 @@ func NewSingleStreamWriter(
 	err := res.initStream()
 	if err != nil {
 		_ = res.close(context.Background(), err)
+
 		return nil, err
 	}
 	res.start()
+
 	return res, nil
 }
 
@@ -160,6 +162,7 @@ func (w *SingleStreamWriter) initStream() error {
 	w.ReceivedLastSeqNum = result.LastSeqNo
 	w.PartitionID = result.PartitionID
 	w.CodecsFromServer = result.SupportedCodecs
+
 	return nil
 }
 
@@ -183,6 +186,7 @@ func (w *SingleStreamWriter) receiveMessagesLoop(ctx context.Context) {
 		if err != nil {
 			err = xerrors.WithStackTrace(fmt.Errorf("ydb: failed to receive message from write stream: %w", err))
 			_ = w.close(ctx, err)
+
 			return
 		}
 
@@ -193,6 +197,7 @@ func (w *SingleStreamWriter) receiveMessagesLoop(ctx context.Context) {
 				closeCtx, closeCtxCancel := xcontext.WithCancel(ctx)
 				closeCtxCancel()
 				_ = w.close(closeCtx, reason)
+
 				return
 			}
 		case *rawtopicwriter.UpdateTokenResponse:
@@ -216,12 +221,14 @@ func (w *SingleStreamWriter) sendMessagesFromQueueToStreamLoop(ctx context.Conte
 		messages, err := w.cfg.queue.GetMessagesForSend(ctx)
 		if err != nil {
 			_ = w.close(ctx, err)
+
 			return
 		}
 
 		targetCodec, err := w.Encoder.CompressMessages(messages)
 		if err != nil {
 			_ = w.close(ctx, err)
+
 			return
 		}
 
@@ -238,6 +245,7 @@ func (w *SingleStreamWriter) sendMessagesFromQueueToStreamLoop(ctx context.Conte
 		if err != nil {
 			err = xerrors.WithStackTrace(fmt.Errorf("ydb: error send message to topic stream: %w", err))
 			_ = w.close(ctx, err)
+
 			return
 		}
 	}
@@ -277,5 +285,6 @@ func (w *SingleStreamWriter) sendUpdateToken(ctx context.Context) error {
 
 	req := &rawtopicwriter.UpdateTokenRequest{}
 	req.Token = token
+
 	return stream.Send(req)
 }

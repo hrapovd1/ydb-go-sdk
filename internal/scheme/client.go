@@ -34,6 +34,7 @@ func (c *Client) Close(_ context.Context) error {
 	if c == nil {
 		return xerrors.WithStackTrace(errNilClient)
 	}
+
 	return nil
 }
 
@@ -61,6 +62,7 @@ func (c *Client) MakeDirectory(ctx context.Context, path string) error {
 	if !c.config.AutoRetry() {
 		return call(ctx)
 	}
+
 	return retry.Retry(ctx, call,
 		retry.WithStackTrace(),
 		retry.WithIdempotent(true),
@@ -81,6 +83,7 @@ func (c *Client) makeDirectory(ctx context.Context, path string) error {
 			),
 		},
 	)
+
 	return xerrors.WithStackTrace(err)
 }
 
@@ -101,6 +104,7 @@ func (c *Client) RemoveDirectory(ctx context.Context, path string) error {
 	if !c.config.AutoRetry() {
 		return call(ctx)
 	}
+
 	return retry.Retry(ctx, call,
 		retry.WithStackTrace(),
 		retry.WithIdempotent(true),
@@ -121,6 +125,7 @@ func (c *Client) removeDirectory(ctx context.Context, path string) error {
 			),
 		},
 	)
+
 	return xerrors.WithStackTrace(err)
 }
 
@@ -139,6 +144,7 @@ func (c *Client) ListDirectory(ctx context.Context, path string) (scheme.Directo
 	}
 	if !c.config.AutoRetry() {
 		err := call(ctx)
+
 		return d, xerrors.WithStackTrace(err)
 	}
 	err := retry.Retry(ctx, call,
@@ -146,6 +152,7 @@ func (c *Client) ListDirectory(ctx context.Context, path string) (scheme.Directo
 		retry.WithStackTrace(),
 		retry.WithTrace(c.config.TraceRetry()),
 	)
+
 	return d, xerrors.WithStackTrace(err)
 }
 
@@ -178,6 +185,7 @@ func (c *Client) listDirectory(ctx context.Context, path string) (scheme.Directo
 	d.From(result.Self)
 	d.Children = make([]scheme.Entry, len(result.Children))
 	putEntry(d.Children, result.Children)
+
 	return d, nil
 }
 
@@ -198,10 +206,12 @@ func (c *Client) DescribePath(ctx context.Context, path string) (scheme.Entry, e
 		if finalErr != nil {
 			return xerrors.WithStackTrace(finalErr)
 		}
+
 		return nil
 	}
 	if !c.config.AutoRetry() {
 		err := call(ctx)
+
 		return e, err
 	}
 	err := retry.Retry(ctx, call,
@@ -209,6 +219,7 @@ func (c *Client) DescribePath(ctx context.Context, path string) (scheme.Entry, e
 		retry.WithStackTrace(),
 		retry.WithTrace(c.config.TraceRetry()),
 	)
+
 	return e, xerrors.WithStackTrace(err)
 }
 
@@ -238,6 +249,7 @@ func (c *Client) describePath(ctx context.Context, path string) (scheme.Entry, e
 		return e, xerrors.WithStackTrace(err)
 	}
 	e.From(result.Self)
+
 	return e, nil
 }
 
@@ -266,6 +278,7 @@ func (c *Client) ModifyPermissions(
 	if !c.config.AutoRetry() {
 		return call(ctx)
 	}
+
 	return retry.Retry(ctx, call,
 		retry.WithStackTrace(),
 		retry.WithIdempotent(true),
@@ -291,6 +304,7 @@ func (c *Client) modifyPermissions(ctx context.Context, path string, desc permis
 	if err != nil {
 		return xerrors.WithStackTrace(err)
 	}
+
 	return nil
 }
 

@@ -157,5 +157,6 @@ func (c *Client) Close(context.Context) error {
 	if cc, has := c.cc.(io.Closer); has {
 		return cc.Close()
 	}
+
 	return nil
 }

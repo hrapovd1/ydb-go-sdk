@@ -38,6 +38,7 @@ func databaseSQL(config Config) trace.DatabaseSQL {
 				}
 			}
 		}
+
 		return nil
 	}
 	t.OnConnClose = func(info trace.DatabaseSQLConnCloseStartInfo) func(trace.DatabaseSQLConnCloseDoneInfo) {
@@ -46,6 +47,7 @@ func databaseSQL(config Config) trace.DatabaseSQL {
 				conns.With(nil).Add(-1)
 			}
 		}
+
 		return nil
 	}
 	t.OnConnBegin = func(info trace.DatabaseSQLConnBeginStartInfo) func(trace.DatabaseSQLConnBeginDoneInfo) {
@@ -58,10 +60,12 @@ func databaseSQL(config Config) trace.DatabaseSQL {
 				txBeginLatency.With(nil).Record(time.Since(start))
 			}
 		}
+
 		return nil
 	}
 	t.OnTxCommit = func(info trace.DatabaseSQLTxCommitStartInfo) func(trace.DatabaseSQLTxCommitDoneInfo) {
 		start := time.Now()
+
 		return func(info trace.DatabaseSQLTxCommitDoneInfo) {
 			if config.Details()&trace.DatabaseSQLTxEvents != 0 {
 				txCommit.With(map[string]string{
@@ -73,6 +77,7 @@ func databaseSQL(config Config) trace.DatabaseSQL {
 	}
 	t.OnTxExec = func(info trace.DatabaseSQLTxExecStartInfo) func(trace.DatabaseSQLTxExecDoneInfo) {
 		start := time.Now()
+
 		return func(info trace.DatabaseSQLTxExecDoneInfo) {
 			if config.Details()&trace.DatabaseSQLTxEvents != 0 {
 				status := errorBrief(info.Error)
@@ -85,6 +90,7 @@ func databaseSQL(config Config) trace.DatabaseSQL {
 	}
 	t.OnTxQuery = func(info trace.DatabaseSQLTxQueryStartInfo) func(trace.DatabaseSQLTxQueryDoneInfo) {
 		start := time.Now()
+
 		return func(info trace.DatabaseSQLTxQueryDoneInfo) {
 			if config.Details()&trace.DatabaseSQLTxEvents != 0 {
 				status := errorBrief(info.Error)
@@ -97,6 +103,7 @@ func databaseSQL(config Config) trace.DatabaseSQL {
 	}
 	t.OnTxRollback = func(info trace.DatabaseSQLTxRollbackStartInfo) func(trace.DatabaseSQLTxRollbackDoneInfo) {
 		start := time.Now()
+
 		return func(info trace.DatabaseSQLTxRollbackDoneInfo) {
 			if config.Details()&trace.DatabaseSQLTxEvents != 0 {
 				txRollback.With(map[string]string{
@@ -114,6 +121,7 @@ func databaseSQL(config Config) trace.DatabaseSQL {
 			mode  = info.Mode
 			start = time.Now()
 		)
+
 		return func(info trace.DatabaseSQLConnExecDoneInfo) {
 			if config.Details()&trace.DatabaseSQLEvents != 0 {
 				inflight.With(nil).Add(-1)
@@ -138,6 +146,7 @@ func databaseSQL(config Config) trace.DatabaseSQL {
 			mode  = info.Mode
 			start = time.Now()
 		)
+
 		return func(info trace.DatabaseSQLConnQueryDoneInfo) {
 			if config.Details()&trace.DatabaseSQLEvents != 0 {
 				inflight.With(nil).Add(-1)
@@ -154,5 +163,6 @@ func databaseSQL(config Config) trace.DatabaseSQL {
 			}
 		}
 	}
+
 	return t
 }

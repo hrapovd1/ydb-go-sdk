@@ -112,6 +112,7 @@ func (m Method) Split() (string, string) {
 	if i == -1 {
 		return string(m), string(m)
 	}
+
 	return strings.TrimPrefix(string(m[:i]), "/"), string(m[i+1:])
 }
 

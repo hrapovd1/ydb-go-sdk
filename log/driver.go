@@ -30,6 +30,7 @@ func internalDriver(l *wrapper, d trace.Detailer) trace.Driver { //nolint:gocycl
 			String("target", target),
 			Strings("resolved", addresses),
 		)
+
 		return func(info trace.DriverResolveDoneInfo) {
 			if info.Error == nil {
 				l.Log(ctx, "done",
@@ -60,6 +61,7 @@ func internalDriver(l *wrapper, d trace.Detailer) trace.Driver { //nolint:gocycl
 			Bool("secure", secure),
 		)
 		start := time.Now()
+
 		return func(info trace.DriverInitDoneInfo) {
 			if info.Error == nil {
 				l.Log(ctx, "done",
@@ -87,6 +89,7 @@ func internalDriver(l *wrapper, d trace.Detailer) trace.Driver { //nolint:gocycl
 		ctx := with(*info.Context, TRACE, "ydb", "driver", "resolver", "close")
 		l.Log(ctx, "start")
 		start := time.Now()
+
 		return func(info trace.DriverCloseDoneInfo) {
 			if info.Error == nil {
 				l.Log(ctx, "done",
@@ -111,6 +114,7 @@ func internalDriver(l *wrapper, d trace.Detailer) trace.Driver { //nolint:gocycl
 			Stringer("endpoint", endpoint),
 		)
 		start := time.Now()
+
 		return func(info trace.DriverConnDialDoneInfo) {
 			if info.Error == nil {
 				l.Log(ctx, "done",
@@ -138,6 +142,7 @@ func internalDriver(l *wrapper, d trace.Detailer) trace.Driver { //nolint:gocycl
 			Stringer("state", info.State),
 		)
 		start := time.Now()
+
 		return func(info trace.DriverConnStateChangeDoneInfo) {
 			l.Log(ctx, "done",
 				Stringer("endpoint", endpoint),
@@ -156,6 +161,7 @@ func internalDriver(l *wrapper, d trace.Detailer) trace.Driver { //nolint:gocycl
 			Stringer("endpoint", endpoint),
 		)
 		start := time.Now()
+
 		return func(info trace.DriverConnParkDoneInfo) {
 			if info.Error == nil {
 				l.Log(ctx, "done",
@@ -182,6 +188,7 @@ func internalDriver(l *wrapper, d trace.Detailer) trace.Driver { //nolint:gocycl
 			Stringer("endpoint", endpoint),
 		)
 		start := time.Now()
+
 		return func(info trace.DriverConnCloseDoneInfo) {
 			if info.Error == nil {
 				l.Log(ctx, "done",
@@ -210,6 +217,7 @@ func internalDriver(l *wrapper, d trace.Detailer) trace.Driver { //nolint:gocycl
 			String("method", method),
 		)
 		start := time.Now()
+
 		return func(info trace.DriverConnInvokeDoneInfo) {
 			if info.Error == nil {
 				l.Log(ctx, "done",
@@ -248,6 +256,7 @@ func internalDriver(l *wrapper, d trace.Detailer) trace.Driver { //nolint:gocycl
 			String("method", method),
 		)
 		start := time.Now()
+
 		return func(info trace.DriverConnNewStreamRecvInfo) func(trace.DriverConnNewStreamDoneInfo) {
 			if info.Error == nil {
 				l.Log(ctx, "intermediate receive",
@@ -264,6 +273,7 @@ func internalDriver(l *wrapper, d trace.Detailer) trace.Driver { //nolint:gocycl
 					versionField(),
 				)
 			}
+
 			return func(info trace.DriverConnNewStreamDoneInfo) {
 				if info.Error == nil {
 					l.Log(ctx, "done",
@@ -297,6 +307,7 @@ func internalDriver(l *wrapper, d trace.Detailer) trace.Driver { //nolint:gocycl
 			versionField(),
 		)
 		start := time.Now()
+
 		return func(info trace.DriverConnBanDoneInfo) {
 			l.Log(WithLevel(ctx, WARN), "done",
 				Stringer("endpoint", endpoint),
@@ -316,6 +327,7 @@ func internalDriver(l *wrapper, d trace.Detailer) trace.Driver { //nolint:gocycl
 			Stringer("endpoint", endpoint),
 		)
 		start := time.Now()
+
 		return func(info trace.DriverConnAllowDoneInfo) {
 			l.Log(ctx, "done",
 				Stringer("endpoint", endpoint),
@@ -336,6 +348,7 @@ func internalDriver(l *wrapper, d trace.Detailer) trace.Driver { //nolint:gocycl
 			String("event", event),
 		)
 		start := time.Now()
+
 		return func(info trace.DriverRepeaterWakeUpDoneInfo) {
 			if info.Error == nil {
 				l.Log(ctx, "done",
@@ -361,6 +374,7 @@ func internalDriver(l *wrapper, d trace.Detailer) trace.Driver { //nolint:gocycl
 		ctx := with(*info.Context, TRACE, "ydb", "driver", "balancer", "init")
 		l.Log(ctx, "start")
 		start := time.Now()
+
 		return func(info trace.DriverBalancerInitDoneInfo) {
 			l.Log(WithLevel(ctx, INFO), "done",
 				latencyField(start),
@@ -374,6 +388,7 @@ func internalDriver(l *wrapper, d trace.Detailer) trace.Driver { //nolint:gocycl
 		ctx := with(*info.Context, TRACE, "ydb", "driver", "balancer", "close")
 		l.Log(ctx, "start")
 		start := time.Now()
+
 		return func(info trace.DriverBalancerCloseDoneInfo) {
 			if info.Error == nil {
 				l.Log(ctx, "done",
@@ -399,6 +414,7 @@ func internalDriver(l *wrapper, d trace.Detailer) trace.Driver { //nolint:gocycl
 		ctx := with(*info.Context, TRACE, "ydb", "driver", "balancer", "choose", "endpoint")
 		l.Log(ctx, "start")
 		start := time.Now()
+
 		return func(info trace.DriverBalancerChooseEndpointDoneInfo) {
 			if info.Error == nil {
 				l.Log(ctx, "done",
@@ -427,6 +443,7 @@ func internalDriver(l *wrapper, d trace.Detailer) trace.Driver { //nolint:gocycl
 			Bool("needLocalDC", info.NeedLocalDC),
 		)
 		start := time.Now()
+
 		return func(info trace.DriverBalancerUpdateDoneInfo) {
 			l.Log(ctx, "done",
 				latencyField(start),
@@ -444,6 +461,7 @@ func internalDriver(l *wrapper, d trace.Detailer) trace.Driver { //nolint:gocycl
 		ctx := with(*info.Context, TRACE, "ydb", "driver", "credentials", "get")
 		l.Log(ctx, "start")
 		start := time.Now()
+
 		return func(info trace.DriverGetCredentialsDoneInfo) {
 			if info.Error == nil {
 				l.Log(ctx, "done",
@@ -460,5 +478,6 @@ func internalDriver(l *wrapper, d trace.Detailer) trace.Driver { //nolint:gocycl
 			}
 		}
 	}
+
 	return t
 }

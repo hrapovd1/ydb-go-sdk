@@ -39,6 +39,7 @@ func table(config Config) trace.Table {
 				"node_id": idToString(info.Session.NodeID()),
 			}).Add(-1)
 		}
+
 		return nil
 	}
 	t.OnPoolSessionAdd = func(info trace.TablePoolSessionAddInfo) {
@@ -55,6 +56,7 @@ func table(config Config) trace.Table {
 	t.OnPoolGet = func(info trace.TablePoolGetStartInfo) func(trace.TablePoolGetDoneInfo) {
 		wait.With(nil).Add(1)
 		start := time.Now()
+
 		return func(info trace.TablePoolGetDoneInfo) {
 			wait.With(nil).Add(-1)
 			if info.Error == nil && config.Details()&trace.TablePoolEvents != 0 {
@@ -73,7 +75,9 @@ func table(config Config) trace.Table {
 			}
 			inflightLatency.With(nil).Record(time.Since(start.(time.Time)))
 		}
+
 		return nil
 	}
+
 	return t
 }

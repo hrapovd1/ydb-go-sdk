@@ -54,6 +54,7 @@ func DatetimeToTime(n uint32) time.Time {
 func TimestampToTime(n uint64) time.Time {
 	sec := n / 1e6
 	nsec := (n - (sec * 1e6)) * 1000
+
 	return time.Unix(int64(sec), int64(nsec))
 }
 
@@ -73,6 +74,7 @@ func TzDateToTime(s string) (time.Time, error) {
 	if err != nil {
 		return t, xerrors.WithStackTrace(fmt.Errorf("parse '%s' failed: %w", s, err))
 	}
+
 	return t, nil
 }
 
@@ -92,6 +94,7 @@ func TzDatetimeToTime(s string) (time.Time, error) {
 	if err != nil {
 		return t, xerrors.WithStackTrace(fmt.Errorf("parse '%s' failed: %w", s, err))
 	}
+
 	return t, nil
 }
 
@@ -115,5 +118,6 @@ func TzTimestampToTime(s string) (time.Time, error) {
 	if err != nil {
 		return t, xerrors.WithStackTrace(fmt.Errorf("parse '%s' failed: %w", s, err))
 	}
+
 	return t, nil
 }

@@ -33,6 +33,7 @@ func (c *Client) Close(ctx context.Context) error {
 	if c == nil {
 		return xerrors.WithStackTrace(errNilClient)
 	}
+
 	return nil
 }
 
@@ -57,6 +58,7 @@ func (c *Client) CreateResource(
 	if !c.config.AutoRetry() {
 		return call(ctx)
 	}
+
 	return retry.Retry(ctx, call,
 		retry.WithStackTrace(),
 		retry.WithIdempotent(true),
@@ -104,6 +106,7 @@ func (c *Client) AlterResource(
 	if !c.config.AutoRetry() {
 		return call(ctx)
 	}
+
 	return retry.Retry(ctx, call,
 		retry.WithStackTrace(),
 		retry.WithIdempotent(true),
@@ -151,6 +154,7 @@ func (c *Client) DropResource(
 	if !c.config.AutoRetry() {
 		return call(ctx)
 	}
+
 	return retry.Retry(ctx, call,
 		retry.WithStackTrace(),
 		retry.WithIdempotent(true),
@@ -186,12 +190,14 @@ func (c *Client) ListResource(
 	if c == nil {
 		return list, xerrors.WithStackTrace(errNilClient)
 	}
-	call := func(ctx context.Context) error {
-		_, err := c.listResource(ctx, coordinationNodePath, resourcePath, recursive)
+	call := func(ctx context.Context) (err error) {
+		list, err = c.listResource(ctx, coordinationNodePath, resourcePath, recursive)
+
 		return xerrors.WithStackTrace(err)
 	}
 	if !c.config.AutoRetry() {
 		err := call(ctx)
+
 		return list, err
 	}
 	err := retry.Retry(ctx, call,
@@ -199,6 +205,7 @@ func (c *Client) ListResource(
 		retry.WithStackTrace(),
 		retry.WithTrace(c.config.TraceRetry()),
 	)
+
 	return list, err
 }
 
@@ -230,6 +237,7 @@ func (c *Client) listResource(
 	if err != nil {
 		return nil, xerrors.WithStackTrace(err)
 	}
+
 	return result.GetResourcePaths(), nil
 }
 
@@ -247,6 +255,7 @@ func (c *Client) DescribeResource(
 	}
 	call := func(ctx context.Context) error {
 		resource, err = c.describeResource(ctx, coordinationNodePath, resourcePath)
+
 		return xerrors.WithStackTrace(err)
 	}
 	if !c.config.AutoRetry() {
@@ -321,6 +330,7 @@ func (c *Client) AcquireResource(
 	if !c.config.AutoRetry() {
 		return call(ctx)
 	}
+
 	return retry.Retry(ctx, call,
 		retry.WithStackTrace(),
 		retry.WithTrace(c.config.TraceRetry()),

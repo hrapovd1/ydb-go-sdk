@@ -55,6 +55,7 @@ func (b *Balancer) HasNode(id uint32) bool {
 	if _, has := b.connectionsState.connByNodeID[id]; has {
 		return true
 	}
+
 	return false
 }
 
@@ -80,8 +81,10 @@ func (b *Balancer) clusterDiscovery(ctx context.Context) error {
 				if ctx.Err() == nil && xerrors.IsTimeoutError(err) {
 					return xerrors.WithStackTrace(xerrors.Retryable(err))
 				}
+
 				return xerrors.WithStackTrace(err)
 			}
+
 			return nil
 		},
 		retry.WithIdempotent(true),
@@ -163,6 +166,7 @@ func endpointsDiff(newestEndpoints []endpoint.Endpoint, previousConns []conn.Con
 			dropped = append(dropped, c.Endpoint().Copy())
 		}
 	}
+
 	return nodes, added, dropped
 }
 
@@ -318,11 +322,13 @@ func (b *Balancer) NewStream(
 	)
 	err = b.wrapCall(ctx, func(ctx context.Context, cc conn.Conn) error {
 		client, err = cc.NewStream(ctx, desc, method, opts...)
+
 		return err
 	})
 	if err == nil {
 		return client, nil
 	}
+
 	return nil, err
 }
 
@@ -355,8 +361,10 @@ func (b *Balancer) wrapCall(ctx context.Context, f func(ctx context.Context, cc 
 					credentials.WithCredentials(b.driverConfig.Credentials()),
 				)
 			}
+
 			return xerrors.WithStackTrace(err)
 		}
+
 		return err
 	}
 
@@ -408,6 +416,7 @@ func (b *Balancer) getConn(ctx context.Context) (conn.Conn, error) {
 			fmt.Errorf("%w: cannot get connection from Balancer after %d attempts", ErrNoEndpoints, failedCount),
 		)
 	}
+
 	return c, nil
 }
 
@@ -416,5 +425,6 @@ func endpointsToConnections(p *conn.Pool, endpoints []endpoint.Endpoint) []conn.
 	for _, e := range endpoints {
 		conns = append(conns, p.Get(e))
 	}
+
 	return conns
 }

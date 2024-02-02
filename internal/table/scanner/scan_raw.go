@@ -22,6 +22,7 @@ type rawConverter struct {
 
 func (s *rawConverter) String() []byte {
 	s.unwrap()
+
 	return s.bytes()
 }
 
@@ -36,6 +37,7 @@ func (s *rawConverter) HasNextItem() bool {
 func (s *rawConverter) Path() string {
 	var buf bytes.Buffer
 	_, _ = s.WritePathTo(&buf)
+
 	return buf.String()
 }
 
@@ -65,6 +67,7 @@ func (s *rawConverter) WritePathTo(w io.Writer) (int64, error) {
 		}
 		n += int64(m)
 	}
+
 	return n, nil
 }
 
@@ -77,6 +80,7 @@ func (s *rawConverter) Bool() bool {
 		return false
 	}
 	s.unwrap()
+
 	return s.bool()
 }
 
@@ -85,6 +89,7 @@ func (s *rawConverter) Int8() int8 {
 		return 0
 	}
 	s.unwrap()
+
 	return s.int8()
 }
 
@@ -93,6 +98,7 @@ func (s *rawConverter) Uint8() uint8 {
 		return 0
 	}
 	s.unwrap()
+
 	return s.uint8()
 }
 
@@ -101,6 +107,7 @@ func (s *rawConverter) Int16() int16 {
 		return 0
 	}
 	s.unwrap()
+
 	return s.int16()
 }
 
@@ -109,6 +116,7 @@ func (s *rawConverter) Uint16() uint16 {
 		return 0
 	}
 	s.unwrap()
+
 	return s.uint16()
 }
 
@@ -117,6 +125,7 @@ func (s *rawConverter) Int32() int32 {
 		return 0
 	}
 	s.unwrap()
+
 	return s.int32()
 }
 
@@ -125,6 +134,7 @@ func (s *rawConverter) Uint32() uint32 {
 		return 0
 	}
 	s.unwrap()
+
 	return s.uint32()
 }
 
@@ -133,6 +143,7 @@ func (s *rawConverter) Int64() int64 {
 		return 0
 	}
 	s.unwrap()
+
 	return s.int64()
 }
 
@@ -141,6 +152,7 @@ func (s *rawConverter) Uint64() uint64 {
 		return 0
 	}
 	s.unwrap()
+
 	return s.uint64()
 }
 
@@ -149,6 +161,7 @@ func (s *rawConverter) Float() float32 {
 		return 0
 	}
 	s.unwrap()
+
 	return s.float()
 }
 
@@ -157,26 +170,31 @@ func (s *rawConverter) Double() float64 {
 		return 0
 	}
 	s.unwrap()
+
 	return s.double()
 }
 
 func (s *rawConverter) Date() time.Time {
 	s.unwrap()
+
 	return value.DateToTime(s.uint32())
 }
 
 func (s *rawConverter) Datetime() time.Time {
 	s.unwrap()
+
 	return value.DatetimeToTime(s.uint32())
 }
 
 func (s *rawConverter) Timestamp() time.Time {
 	s.unwrap()
+
 	return value.TimestampToTime(s.uint64())
 }
 
 func (s *rawConverter) Interval() time.Duration {
 	s.unwrap()
+
 	return value.IntervalToDuration(s.int64())
 }
 
@@ -189,6 +207,7 @@ func (s *rawConverter) TzDate() time.Time {
 	if err != nil {
 		_ = s.errorf(0, "rawConverter.TzDate(): %w", err)
 	}
+
 	return src
 }
 
@@ -201,6 +220,7 @@ func (s *rawConverter) TzDatetime() time.Time {
 	if err != nil {
 		_ = s.errorf(0, "rawConverter.TzDatetime(): %w", err)
 	}
+
 	return src
 }
 
@@ -213,6 +233,7 @@ func (s *rawConverter) TzTimestamp() time.Time {
 	if err != nil {
 		_ = s.errorf(0, "rawConverter.TzTimestamp(): %w", err)
 	}
+
 	return src
 }
 
@@ -221,21 +242,25 @@ func (s *rawConverter) UTF8() string {
 		return ""
 	}
 	s.unwrap()
+
 	return s.text()
 }
 
 func (s *rawConverter) YSON() []byte {
 	s.unwrap()
+
 	return s.bytes()
 }
 
 func (s *rawConverter) JSON() []byte {
 	s.unwrap()
+
 	return xstring.ToBytes(s.text())
 }
 
 func (s *rawConverter) JSONDocument() []byte {
 	s.unwrap()
+
 	return xstring.ToBytes(s.text())
 }
 
@@ -244,6 +269,7 @@ func (s *rawConverter) UUID() [16]byte {
 		return [16]byte{}
 	}
 	s.unwrap()
+
 	return s.uint128()
 }
 
@@ -252,6 +278,7 @@ func (s *rawConverter) DyNumber() string {
 		return ""
 	}
 	s.unwrap()
+
 	return s.text()
 }
 
@@ -265,6 +292,7 @@ func (s *rawConverter) Value() types.Value {
 		return nil
 	}
 	s.unwrap()
+
 	return s.value()
 }
 
@@ -283,6 +311,7 @@ func (s *rawConverter) IsNull() bool {
 	if s.Err() != nil {
 		return false
 	}
+
 	return s.isNull()
 }
 
@@ -290,6 +319,7 @@ func (s *rawConverter) IsOptional() bool {
 	if s.Err() != nil {
 		return false
 	}
+
 	return s.isCurrentTypeOptional()
 }
 
@@ -498,6 +528,7 @@ func (s *rawConverter) Variant() (string, uint32) {
 		t:    typ,
 		v:    v,
 	})
+
 	return name, index
 }
 
@@ -531,6 +562,7 @@ func (s *rawConverter) Decimal(t types.Type) [16]byte {
 	if !s.assertCurrentTypeDecimal(t) {
 		return v
 	}
+
 	return s.uint128()
 }
 
@@ -544,6 +576,7 @@ func (s *rawConverter) UnwrapDecimal() types.Decimal {
 	if d == nil {
 		return v
 	}
+
 	return types.Decimal{
 		Bytes:     s.uint128(),
 		Precision: d.DecimalType.Precision,
@@ -555,17 +588,20 @@ func (s *rawConverter) IsDecimal() bool {
 	if s.Err() != nil {
 		return false
 	}
+
 	return s.isCurrentTypeDecimal()
 }
 
 func isEqualDecimal(d *Ydb.DecimalType, t types.Type) bool {
 	w := t.(*value.DecimalType)
+
 	return d.Precision == w.Precision && d.Scale == w.Scale
 }
 
 func (s *rawConverter) isCurrentTypeDecimal() bool {
 	c := s.stack.current()
 	_, ok := c.t.Type.(*Ydb.Type_DecimalType)
+
 	return ok
 }
 
@@ -578,6 +614,7 @@ func (s *rawConverter) unwrapVariantType(typ *Ydb.Type_VariantType, index uint32
 			_ = s.errorf(0, "unimplemented")
 			return "", &t
 		}
+
 		return "", x.TupleItems.Elements[i]
 
 	case *Ydb.VariantType_StructItems:
@@ -586,6 +623,7 @@ func (s *rawConverter) unwrapVariantType(typ *Ydb.Type_VariantType, index uint32
 			return "", &t
 		}
 		m := x.StructItems.Members[i]
+
 		return m.Name, m.Type
 
 	default:
@@ -609,6 +647,7 @@ func (s *rawConverter) itemsIn() int {
 		return -1
 	}
 	s.stack.enter()
+
 	return len(x.v.Items)
 }
 
@@ -626,6 +665,7 @@ func (s *rawConverter) pairsIn() int {
 		return -1
 	}
 	s.stack.enter()
+
 	return len(x.v.Pairs)
 }
 
@@ -640,8 +680,10 @@ func (s *rawConverter) pairsBoundsCheck(xs []*Ydb.ValuePair, i int) bool {
 func (s *rawConverter) boundsCheck(n, i int) bool {
 	if i < 0 || n <= i {
 		s.boundsError(n, i)
+
 		return false
 	}
+
 	return true
 }
 
@@ -671,6 +713,7 @@ func (s *rawConverter) assertCurrentTypeNullable() bool {
 		c.t,
 		p.t,
 	)
+
 	return false
 }
 
@@ -686,8 +729,10 @@ func (s *rawConverter) assertCurrentTypeIs(t types.Type) bool {
 			act,
 			t,
 		)
+
 		return false
 	}
+
 	return true
 }
 
@@ -698,8 +743,10 @@ func (s *rawConverter) assertCurrentTypeDecimal(t types.Type) bool {
 	}
 	if !isEqualDecimal(d.DecimalType, t) {
 		s.decimalTypeError(t)
+
 		return false
 	}
+
 	return true
 }
 
@@ -775,5 +822,6 @@ func nameIface(v interface{}) string {
 	s = strings.TrimSuffix(s, "Value")
 	s = strings.TrimPrefix(s, "*Ydb.Type_")
 	s = strings.TrimSuffix(s, "Type")
+
 	return s
 }

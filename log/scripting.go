@@ -20,6 +20,7 @@ func internalScripting(l *wrapper, d trace.Detailer) trace.Scripting {
 		ctx := with(*info.Context, TRACE, "ydb", "scripting", "execute")
 		l.Log(ctx, "start")
 		start := time.Now()
+
 		return func(info trace.ScriptingExecuteDoneInfo) {
 			if info.Error == nil {
 				l.Log(ctx, "done",
@@ -43,6 +44,7 @@ func internalScripting(l *wrapper, d trace.Detailer) trace.Scripting {
 		ctx := with(*info.Context, TRACE, "ydb", "scripting", "explain")
 		l.Log(ctx, "start")
 		start := time.Now()
+
 		return func(info trace.ScriptingExplainDoneInfo) {
 			if info.Error == nil {
 				l.Log(ctx, "done",
@@ -76,6 +78,7 @@ func internalScripting(l *wrapper, d trace.Detailer) trace.Scripting {
 			)...,
 		)
 		start := time.Now()
+
 		return func(
 			info trace.ScriptingStreamExecuteIntermediateInfo,
 		) func(
@@ -89,6 +92,7 @@ func internalScripting(l *wrapper, d trace.Detailer) trace.Scripting {
 					versionField(),
 				)
 			}
+
 			return func(info trace.ScriptingStreamExecuteDoneInfo) {
 				if info.Error == nil {
 					l.Log(ctx, "done",
@@ -117,6 +121,7 @@ func internalScripting(l *wrapper, d trace.Detailer) trace.Scripting {
 		ctx := with(*info.Context, TRACE, "ydb", "scripting", "close")
 		l.Log(ctx, "start")
 		start := time.Now()
+
 		return func(info trace.ScriptingCloseDoneInfo) {
 			if info.Error == nil {
 				l.Log(ctx, "done",
@@ -131,5 +136,6 @@ func internalScripting(l *wrapper, d trace.Detailer) trace.Scripting {
 			}
 		}
 	}
+
 	return t
 }

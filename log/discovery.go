@@ -23,6 +23,7 @@ func internalDiscovery(l *wrapper, d trace.Detailer) trace.Discovery {
 			String("database", info.Database),
 		)
 		start := time.Now()
+
 		return func(info trace.DiscoveryDiscoverDoneInfo) {
 			if info.Error == nil {
 				l.Log(WithLevel(ctx, INFO), "done",
@@ -45,6 +46,7 @@ func internalDiscovery(l *wrapper, d trace.Detailer) trace.Discovery {
 		ctx := with(*info.Context, TRACE, "ydb", "discovery", "whoAmI")
 		l.Log(ctx, "start")
 		start := time.Now()
+
 		return func(info trace.DiscoveryWhoAmIDoneInfo) {
 			if info.Error == nil {
 				l.Log(ctx, "done",
@@ -61,5 +63,6 @@ func internalDiscovery(l *wrapper, d trace.Detailer) trace.Discovery {
 			}
 		}
 	}
+
 	return t
 }

@@ -79,6 +79,7 @@ func main() {
 			if err != nil {
 				log.Fatal(err)
 			}
+
 			return f, func() { f.Close() }
 		}
 		f, clean := openFile(name + "_gtrace" + tags + ext)
@@ -160,6 +161,7 @@ func main() {
 			if n == nil {
 				item = nil
 				depth--
+
 				return true
 			}
 			defer func() {
@@ -176,6 +178,7 @@ func main() {
 				if item != nil {
 					item.Ident = v
 				}
+
 				return false
 
 			case *ast.CommentGroup:
@@ -186,6 +189,7 @@ func main() {
 						}
 					}
 				}
+
 				return false
 
 			case *ast.StructType:
@@ -194,6 +198,7 @@ func main() {
 					items = append(items, item)
 					item = nil
 				}
+
 				return false
 			}
 
@@ -229,6 +234,7 @@ func main() {
 					"skipping hook %s due to error: %v",
 					name, err,
 				)
+
 				continue
 			}
 			t.Hooks = append(t.Hooks, Hook{
@@ -290,12 +296,14 @@ func buildFunc(info *types.Info, traces map[string]*Trace, fn *ast.FuncType) (*F
 			return nil, xerrors.WithStackTrace(err)
 		}
 		ret.Result = append(ret.Result, result)
+
 		return ret, nil
 
 	case *ast.Ident:
 		if t, ok := traces[x.Name]; ok {
 			t.Nested = true
 			ret.Result = append(ret.Result, t)
+
 			return ret, nil
 		}
 	}
@@ -398,6 +406,7 @@ func rsplit(s string, c byte) (string, string) {
 	if i == -1 {
 		return s, ""
 	}
+
 	return s[:i], s[i+1:]
 }
 
@@ -414,6 +423,7 @@ func scanBuildConstraints(r io.Reader) ([]string, error) {
 			comm = bytes.TrimSpace(comm)
 			if bytes.HasPrefix(comm, []byte("+build")) {
 				cs = append(cs, string(line))
+
 				continue
 			}
 		}
@@ -421,6 +431,7 @@ func scanBuildConstraints(r io.Reader) ([]string, error) {
 			break
 		}
 	}
+
 	return cs, nil
 }
 
@@ -431,5 +442,6 @@ func isGenerated(base, suffix string) bool {
 	}
 	n := len(base)
 	m := i + len(suffix)
+
 	return m == n || base[m] == '_'
 }

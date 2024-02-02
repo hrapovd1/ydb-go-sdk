@@ -15,6 +15,7 @@ func LoadCertificatesFromFile(caFile string) ([]*x509.Certificate, error) {
 	if err != nil {
 		return nil, xerrors.WithStackTrace(err)
 	}
+
 	return LoadCertificatesFromPem(bytes), nil
 }
 
