@@ -508,11 +508,7 @@ func (s *rawConverter) DictOut() {
 	}
 }
 
-func (s *rawConverter) Variant() (string, uint32) {
-	var (
-		name  string
-		index uint32
-	)
+func (s *rawConverter) Variant() (name string, index uint32) { //nolint:nonamedreturns //gocritic more important
 	if s.Err() != nil {
 		return name, index
 	}

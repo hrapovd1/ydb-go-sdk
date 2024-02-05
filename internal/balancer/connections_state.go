@@ -43,8 +43,8 @@ func (s *connectionsState) PreferredCount() int {
 	return len(s.prefer)
 }
 
-func (s *connectionsState) GetConnection(ctx context.Context) (conn.Conn, int) {
-	var failedCount int
+func (s *connectionsState) GetConnection(ctx context.Context) (_ conn.Conn, failedCount int) { //nolint:nonamedreturns
+	// gocritic more important
 	if err := ctx.Err(); err != nil {
 		return nil, 0
 	}

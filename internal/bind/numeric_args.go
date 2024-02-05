@@ -16,8 +16,8 @@ func (m NumericArgs) blockID() blockID {
 	return blockYQL
 }
 
-func (m NumericArgs) RewriteQuery(sql string, args ...interface{}) (
-	string, []interface{}, error,
+func (m NumericArgs) RewriteQuery(sql string, args ...interface{}) ( //nolint:nonamedreturns // gocritic more important
+	yql string, newArgs []interface{}, err error,
 ) {
 	l := &sqlLexer{
 		src:        sql,
@@ -29,10 +29,8 @@ func (m NumericArgs) RewriteQuery(sql string, args ...interface{}) (
 		l.stateFn = l.stateFn(l)
 	}
 
-	var (
-		buffer  = xstring.Buffer()
-		newArgs []interface{}
-	)
+	buffer := xstring.Buffer()
+
 	defer buffer.Free()
 
 	if len(args) > 0 {

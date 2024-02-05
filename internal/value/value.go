@@ -1949,7 +1949,7 @@ type variantValue struct {
 	idx       uint32
 }
 
-func (v *variantValue) Variant() (string, uint32) {
+func (v *variantValue) Variant() (name string, index uint32) { //nolint:nonamedreturns //gocritic more important
 	switch t := v.innerType.(type) {
 	case *variantStructType:
 		return t.fields[v.idx].Name, v.idx

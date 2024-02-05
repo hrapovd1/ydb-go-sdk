@@ -5,11 +5,11 @@ import (
 )
 
 // Check returns retry mode for err.
-func Check(err error) (
-	int64,
-	Type,
-	backoff.Type,
-	bool,
+func Check(err error) ( //nolint:nonamedreturns //gocritic more important
+	code int64,
+	errType Type,
+	backoffType backoff.Type,
+	deleteSession bool,
 ) {
 	if err == nil {
 		return -1,

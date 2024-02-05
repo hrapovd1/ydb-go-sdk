@@ -11,7 +11,7 @@ func Discovery(l Logger, d trace.Detailer, opts ...Option) trace.Discovery {
 	return internalDiscovery(wrapLogger(l, opts...), d)
 }
 
-func internalDiscovery(l *wrapper, d trace.Detailer) trace.Discovery {
+func internalDiscovery(l *wrapper, d trace.Detailer) trace.Discovery { //nolint:interfacer //deprecated
 	var t trace.Discovery
 	t.OnDiscover = func(info trace.DiscoveryDiscoverStartInfo) func(trace.DiscoveryDiscoverDoneInfo) {
 		if d.Details()&trace.DiscoveryEvents == 0 {

@@ -13,7 +13,8 @@ func Driver(l Logger, d trace.Detailer, opts ...Option) trace.Driver {
 	return internalDriver(wrapLogger(l, opts...), d)
 }
 
-func internalDriver(l *wrapper, d trace.Detailer) trace.Driver { //nolint:gocyclo
+//nolint:gocyclo
+func internalDriver(l *wrapper, d trace.Detailer) trace.Driver { //nolint:interfacer //deprecated
 	var t trace.Driver
 	t.OnResolve = func(
 		info trace.DriverResolveStartInfo,

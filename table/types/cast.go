@@ -78,7 +78,8 @@ func StructFields(v Value) (map[string]Value, error) {
 }
 
 // VariantValue returns variant value from abstract Value
-func VariantValue(v Value) (string, uint32, Value, error) {
+func VariantValue(v Value) (name string, idx uint32, _ Value, _ error) { //nolint:nonamedreturns
+	// gocritic more important
 	if vv, has := v.(interface {
 		Variant() (name string, index uint32)
 		Value() Value

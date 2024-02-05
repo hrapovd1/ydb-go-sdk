@@ -109,7 +109,7 @@ type Issue interface {
 }
 
 // Split returns service name and method.
-func (m Method) Split() (string, string) {
+func (m Method) Split() (service, method string) { //nolint:nonamedreturns //gocritic more important
 	i := strings.LastIndex(string(m), "/")
 	if i == -1 {
 		return string(m), string(m)

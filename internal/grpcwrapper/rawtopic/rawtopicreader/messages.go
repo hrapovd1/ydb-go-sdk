@@ -192,11 +192,10 @@ func (r *ReadResponse) GetBytesSize() int {
 }
 
 // GetPartitionBatchMessagesCounts implements trace.TopicReaderDataResponseInfo
-func (r *ReadResponse) GetPartitionBatchMessagesCounts() (int, int, int) {
-	var (
-		partitionDataCount        = len(r.PartitionData)
-		batchCount, messagesCount int
-	)
+func (r *ReadResponse) GetPartitionBatchMessagesCounts() ( //nolint:nonamedreturns // gocritic more important
+	partitionDataCount, batchCount, messagesCount int,
+) {
+	partitionDataCount = len(r.PartitionData)
 	for partitionIndex := range r.PartitionData {
 		partitionData := &r.PartitionData[partitionIndex]
 		batchCount += len(partitionData.Batches)

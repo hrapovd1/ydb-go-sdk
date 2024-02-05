@@ -75,7 +75,7 @@ func (r *rows) ColumnTypeDatabaseTypeName(index int) string {
 // TODO: Need to store column nullables to internal rows cache.
 //
 //nolint:godox
-func (r *rows) ColumnTypeNullable(index int) (bool, bool) {
+func (r *rows) ColumnTypeNullable(index int) (nullable, ok bool) { //nolint:nonamedreturns //gocritic more important
 	r.nextSet.Do(func() {
 		r.result.NextResultSet(context.Background())
 	})
